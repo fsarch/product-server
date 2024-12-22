@@ -23,6 +23,8 @@ import { ItemAttributes1733697377083 } from "./database/migrations/1733697377083
 import { BooleanAttribute1734872207303 } from "./database/migrations/1734872207303-boolean-attribute.js";
 import { NumberAttribute1734872605134 } from "./database/migrations/1734872605134-number-attribute.js";
 import { TextAttribute1734873407457 } from "./database/migrations/1734873407457-text-attribute.js";
+import { ControllersModule } from './controllers/controllers.module.js';
+import { RepositoriesModule } from './repositories/repositories.module.js';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { TextAttribute1734873407457 } from "./database/migrations/1734873407457-
         ],
       },
     }),
+    ControllersModule,
+    RepositoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
