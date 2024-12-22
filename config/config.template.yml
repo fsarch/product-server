@@ -1,0 +1,21 @@
+uac:
+  type: 'static'
+  users:
+    - user_id: 'abcdef'
+      permissions:
+        - manage_claims
+
+auth:
+  type: 'jwt-jwk'
+  jwkUrl: ''
+
+database:
+  type: cockroachdb
+  host: '10.0.4.13'
+  username: dev_product-server
+  password: '123456'
+  database: dev_product-server
+  ssl:
+    rejectUnauthorized: false
+    ca:
+      path: ./config/certs/dev/ca.crt
