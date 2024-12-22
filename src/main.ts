@@ -12,8 +12,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Image-Server')
-    .setDescription('The Image-Server API description')
+    .setTitle('Product-Server')
+    .setDescription('The Product-Server API description')
     .addBearerAuth()
     .setVersion('1.0')
     .build();

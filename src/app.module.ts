@@ -20,6 +20,9 @@ import { Localization } from "./database/entities/localization.entity.js";
 import { BaseTables1720373216667 } from "./database/migrations/1733690865449-base-tables.js";
 import { Item1733694484415 } from "./database/migrations/1733694484415-item.js";
 import { ItemAttributes1733697377083 } from "./database/migrations/1733697377083-item-attributes.js";
+import { BooleanAttribute1734872207303 } from "./database/migrations/1734872207303-boolean-attribute.js";
+import { NumberAttribute1734872605134 } from "./database/migrations/1734872605134-number-attribute.js";
+import { TextAttribute1734873407457 } from "./database/migrations/1734873407457-text-attribute.js";
 
 @Module({
   imports: [
@@ -47,6 +50,9 @@ import { ItemAttributes1733697377083 } from "./database/migrations/1733697377083
           BaseTables1720373216667,
           Item1733694484415,
           ItemAttributes1733697377083,
+          BooleanAttribute1734872207303,
+          NumberAttribute1734872605134,
+          TextAttribute1734873407457,
         ],
       },
     }),
