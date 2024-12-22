@@ -16,13 +16,6 @@ export class AttributeType {
   id: string;
 
   @Column({
-    name: 'catalog_id',
-    type: 'uuid',
-    nullable: false,
-  })
-  catalogId: string;
-
-  @Column({
     name: 'name',
     length: '512',
     nullable: false,

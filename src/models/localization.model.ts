@@ -9,7 +9,7 @@ export class LocalizationCreateDto {
   countryCode: string;
 
   @ApiProperty()
-  name: string;
+  languageCode: string;
 }
 
 export class LocalizationDto {

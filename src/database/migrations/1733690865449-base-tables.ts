@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { getDataType } from './utils/data-type.mapper.js';
+import { AttributeType } from "../../constants/attribute-type.enum.js";
 
 export class BaseTables1720373216667 implements MigrationInterface {
   name = 'BaseTables1720373216667';
@@ -97,11 +98,6 @@ export class BaseTables1720373216667 implements MigrationInterface {
             primaryKeyConstraintName: 'pk__attribute_type',
           },
           {
-            name: 'catalog_id',
-            type: 'uuid',
-            isNullable: false,
-          },
-          {
             name: 'name',
             type: 'varchar',
             length: '2048',
@@ -125,20 +121,42 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__attribute_type__catalog_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['catalog_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'catalog',
-        }],
         indices: [{
           name: 'IDX__attribute_type__external_id',
           columnNames: ['external_id'],
         }],
       }),
     );
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.NUMBER,
+      name: 'Number',
+      externalId: 'system.number',
+    });
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.TEXT,
+      name: 'Text',
+      externalId: 'system.text',
+    });
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.BOOLEAN,
+      name: 'Boolean',
+      externalId: 'system.boolean',
+    });
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.JSON,
+      name: 'JSON',
+      externalId: 'system.json',
+    });
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.LIST,
+      name: 'List',
+      externalId: 'system.list',
+    });
     // endregion
 
     // region Attribute
