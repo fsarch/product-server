@@ -171,6 +171,11 @@ export class BaseTables1720373216667 implements MigrationInterface {
             primaryKeyConstraintName: 'pk__attribute',
           },
           {
+            name: 'catalog_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
             name: 'attribute_type_id',
             type: 'uuid',
             isNullable: false,
@@ -206,8 +211,21 @@ export class BaseTables1720373216667 implements MigrationInterface {
           columnNames: ['attribute_type_id'],
           referencedColumnNames: ['id'],
           referencedTableName: 'attribute_type',
+        }, {
+          name: 'fk__attribute__catalog_id',
+          onUpdate: 'NO ACTION',
+          onDelete: 'NO ACTION',
+          columnNames: ['catalog_id'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'catalog',
         }],
         indices: [{
+          name: 'IDX__attribute__catalog_id',
+          columnNames: ['catalog_id'],
+        }, {
+          name: 'IDX__attribute__attribute_type_id',
+          columnNames: ['attribute_type_id'],
+        }, {
           name: 'IDX__attribute__external_id',
           columnNames: ['external_id'],
         }],

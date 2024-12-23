@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { VersioningType } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { plainToInstance } from "class-transformer";
+import { TextAttributeCreateDto } from "./models/attribute.model.js";
+import { validate } from "class-validator";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

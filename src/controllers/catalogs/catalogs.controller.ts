@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { CatalogCreateDto, CatalogDto } from "../../models/catalog.model.js";
 import { CatalogService } from "../../repositories/catalog/catalog.service.js";
-import { Public } from "../../fsarch/auth/decorators/public.decorator.js";
 
 @ApiTags('catalog')
 @Controller({

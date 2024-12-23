@@ -25,6 +25,8 @@ import { NumberAttribute1734872605134 } from "./database/migrations/173487260513
 import { TextAttribute1734873407457 } from "./database/migrations/1734873407457-text-attribute.js";
 import { ControllersModule } from './controllers/controllers.module.js';
 import { RepositoriesModule } from './repositories/repositories.module.js';
+import { TextAttribute } from "./database/entities/text_attribute.entity.js";
+import { NumberAttribute } from "./database/entities/number_attribute.entity.js";
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { RepositoriesModule } from './repositories/repositories.module.js';
           ListAttributeElement,
           ListAttributeElementLocalization,
           Localization,
+          TextAttribute,
+          NumberAttribute,
         ],
         migrations: [
           BaseTables1720373216667,
