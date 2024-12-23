@@ -2,12 +2,14 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { LocalizationService } from "../../repositories/localization/localization.service.js";
 import { LocalizationCreateDto, LocalizationDto } from "../../models/localization.model.js";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Public } from "../../fsarch/auth/decorators/public.decorator.js";
 
 @ApiTags('localization')
 @Controller({
   path: 'localizations',
   version: '1',
 })
+@Public()
 @ApiBearerAuth()
 export class LocalizationsController {
   constructor(

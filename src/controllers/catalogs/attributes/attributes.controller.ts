@@ -1,6 +1,6 @@
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { BadRequestException, Body, ConflictException, Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, ConflictException, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiTags, getSchemaPath } from "@nestjs/swagger";
 import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 import {
@@ -11,6 +11,10 @@ import {
 } from "../../../models/attribute.model.js";
 import { AttributeType } from "../../../constants/attribute-type.enum.js";
 import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
+import { AttributeLocalizationDto, AttributeLocalizationSetDto } from "../../../models/attribute-localization.model.js";
+import {
+  AttributeLocalizationService
+} from "../../../repositories/attribute-localization/attribute-localization.service.js";
 
 @ApiTags('attribute')
 @Controller({
@@ -27,6 +31,7 @@ import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
 export class AttributesController {
   constructor(
     private readonly attributeService: AttributeService,
+    private readonly attributeLocalizationService: AttributeLocalizationService,
   ) {}
 
   @Post()
@@ -82,9 +87,28 @@ export class AttributesController {
   }
 
   @Get()
-  public async List() {
+  public async List(
+    @Query('include') include: Array<string>,
+  ) {
     const attributes = await this.attributeService.list();
 
-    return attributes.map(attributeDboToAttributeDto);
+    return Promise.all(attributes.map(async (attribute) => {
+      const mappedAttribute = attributeDboToAttributeDto(attribute);
+      const localizations = await this.attributeLocalizationService.listLocalizationsByAttributeId(attribute.id);
+
+      return {
+        ...mappedAttribute,
+        localizations: localizations.map(AttributeLocalizationDto.FromDbo),
+      }
+    }));
+  }
+
+  @Put(':attributeId/localizations/:localizationId')
+  public async SetLocalization(
+    @Param('attributeId') attributeId: string,
+    @Param('localizationId') localizationId: string,
+    @Body() attributeLocalizationSetDto: AttributeLocalizationSetDto,
+  ) {
+    await this.attributeLocalizationService.setLocalization(attributeId, localizationId, attributeLocalizationSetDto);
   }
 }
