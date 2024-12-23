@@ -4,12 +4,18 @@ import { Repository } from "typeorm";
 import { AttributeLocalization } from "../../database/entities/attribute_localization.entity.js";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as crypto from "node:crypto";
+import { ListAttributeElementLocalizationSetDto } from "../../models/list-attribute-element-localization.model.js";
+import {
+  ListAttributeElementLocalization
+} from "../../database/entities/list_attribute_element_localization.entity.js";
 
 @Injectable()
 export class AttributeLocalizationService {
   constructor(
     @InjectRepository(AttributeLocalization)
     private readonly attributeLocalizationRepository: Repository<AttributeLocalization>,
+    @InjectRepository(ListAttributeElementLocalization)
+    private readonly listAttributeElementLocalizationRepository: Repository<ListAttributeElementLocalization>,
   ) {
   }
 
@@ -41,5 +47,37 @@ export class AttributeLocalizationService {
         attributeId,
       },
     });
+  }
+
+  public async listElementLocalizations(elementId: string): Promise<ListAttributeElementLocalization[]> {
+    return await this.listAttributeElementLocalizationRepository.find({
+      where: {
+        listAttributeElementId: elementId,
+      },
+    });
+  }
+
+  public async setElementLocalization(elementId: string, localizationId: string, setDto: ListAttributeElementLocalizationSetDto) {
+    let localization = await this.listAttributeElementLocalizationRepository.findOne({
+      where: {
+        localizationId,
+        listAttributeElementId: elementId,
+      },
+    })
+
+    if (!localization) {
+      localization = this.listAttributeElementLocalizationRepository.create({
+        id: crypto.randomUUID(),
+        localizationId,
+        listAttributeElementId: elementId,
+        name: setDto.name,
+        content: setDto.content,
+      });
+    }
+
+    localization.name = setDto.name;
+    localization.content = setDto.content;
+
+    return await this.listAttributeElementLocalizationRepository.save(localization);
   }
 }

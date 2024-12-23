@@ -6,6 +6,7 @@ import { IsEnum, IsInt, IsNumber, IsObject, IsOptional, IsString, Min } from "cl
 import { TextAttribute } from "../database/entities/text_attribute.entity.js";
 import { NumberAttribute } from "../database/entities/number_attribute.entity.js";
 import { JsonAttribute } from "../database/entities/json_attribute.entity.js";
+import { AttributeLocalizationDto } from "./attribute-localization.model.js";
 
 export class AttributeCreateDto {
   @ApiProperty()
@@ -109,6 +110,11 @@ export class AttributeDto {
 
   @ApiProperty()
   attributeTypeId: AttributeType;
+
+  @ApiProperty({
+    type: [AttributeLocalizationDto],
+  })
+  localizations?: Array<AttributeLocalizationDto>;
 }
 
 export class TextAttributeDto extends AttributeDto {

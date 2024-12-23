@@ -19,12 +19,16 @@ import { AttributeDbo } from "../../models/dbo/attribute.dbo.js";
 import { TextAttributeDbo } from "../../models/dbo/text-attribute.dbo.js";
 import { NumberAttributeDbo } from "../../models/dbo/number-attribute.dbo.js";
 import { JsonAttributeDbo } from "../../models/dbo/json-attribute.dbo.js";
+import { ListAttributeElement } from "../../database/entities/list_attribute_element.entity.js";
+import { ListAttributeElementCreateDto } from "../../models/list-attribute-element.model.js";
 
 @Injectable()
 export class AttributeService {
   constructor(
     @InjectRepository(Attribute)
     private readonly attributeRepository: Repository<Attribute>,
+    @InjectRepository(ListAttributeElement)
+    private readonly listAttributeElementRepository: Repository<ListAttributeElement>,
     @InjectRepository(ListAttribute)
     private readonly listAttributeRepository: Repository<ListAttribute>,
     @InjectRepository(BooleanAttribute)
@@ -36,6 +40,26 @@ export class AttributeService {
     @InjectRepository(JsonAttribute)
     private readonly jsonAttributeRepository: Repository<JsonAttribute>,
   ) {
+  }
+
+  public async createListElement(listAttributeId: string, createDto: ListAttributeElementCreateDto) {
+    const id = crypto.randomUUID();
+
+    const createdAttributeElement = this.listAttributeElementRepository.create({
+      id,
+      listAttributeId,
+      externalId: createDto.externalId,
+    });
+
+    return await this.listAttributeElementRepository.save(createdAttributeElement);
+  }
+
+  public async listElementsByAttributeId(listAttributeId: string) {
+    return this.listAttributeElementRepository.find({
+      where: {
+        listAttributeId,
+      },
+    });
   }
 
   private async createListAttribute(id: string, createDto: ListAttributeCreateDto) {
@@ -129,35 +153,62 @@ export class AttributeService {
       .orderBy('a.name')
       .execute();
 
-    return list.map((attribute) => {
-      const baseProperties = {
-        id: attribute.id,
-        name: attribute.name,
-        attributeTypeId: attribute.attributeTypeId,
-      };
+    return list.map(this.mapAttribute);
+  }
 
-      if (attribute.attributeTypeId === AttributeType.TEXT) {
-        return plainToInstance(TextAttributeDbo, {
-          ...baseProperties,
-          minLength: attribute['text_attribute.minLength'] ? parseInt(attribute['text_attribute.minLength'], 10) : null,
-          maxLength: attribute['text_attribute.maxLength'] ? parseInt(attribute['text_attribute.maxLength'], 10) : null,
-        });
-      } else if (attribute.attributeTypeId === AttributeType.NUMBER) {
-        return plainToInstance(NumberAttributeDbo, {
-          ...baseProperties,
-          minValue: attribute['number_attribute.minValue'] ? parseFloat(attribute['number_attribute.minValue']) : null,
-          maxValue: attribute['number_attribute.maxValue'] ? parseFloat(attribute['number_attribute.maxValue']) : null,
-          decimals: attribute['number_attribute.decimals'] ? parseInt(attribute['number_attribute.decimals'], 10) : null,
-        });
-      } else if (attribute.attributeTypeId === AttributeType.JSON) {
-        return plainToInstance(JsonAttributeDbo, {
-          ...baseProperties,
-          schema: attribute['json_attribute.schema'],
-        });
-      } else {
-        return plainToInstance(AttributeDbo, baseProperties);
-      }
-    });
+  public async get(id: string) {
+    const item = await this.attributeRepository.createQueryBuilder('a')
+      .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
+      .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
+      .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
+      .select('a.id', 'id')
+      .addSelect('a.name', 'name')
+      .addSelect('ta.min_length', 'text_attribute.minLength')
+      .addSelect('ta.max_length', 'text_attribute.maxLength')
+      .addSelect('na.min_value', 'number_attribute.minValue')
+      .addSelect('na.max_value', 'number_attribute.maxValue')
+      .addSelect('na.decimals', 'number_attribute.decimals')
+      .addSelect('ja.schema', 'json_attribute.schema')
+      .addSelect('a.attribute_type_id', 'attributeTypeId')
+      .where('a.id = :id', { id })
+      .limit(1)
+      .execute();
+
+    if (!item.length) {
+      return null;
+    }
+
+    return this.mapAttribute(item[0]);
+  }
+
+  private mapAttribute(attribute: any) {
+    const baseProperties = {
+      id: attribute.id,
+      name: attribute.name,
+      attributeTypeId: attribute.attributeTypeId,
+    };
+
+    if (attribute.attributeTypeId === AttributeType.TEXT) {
+      return plainToInstance(TextAttributeDbo, {
+        ...baseProperties,
+        minLength: attribute['text_attribute.minLength'] ? parseInt(attribute['text_attribute.minLength'], 10) : null,
+        maxLength: attribute['text_attribute.maxLength'] ? parseInt(attribute['text_attribute.maxLength'], 10) : null,
+      });
+    } else if (attribute.attributeTypeId === AttributeType.NUMBER) {
+      return plainToInstance(NumberAttributeDbo, {
+        ...baseProperties,
+        minValue: attribute['number_attribute.minValue'] ? parseFloat(attribute['number_attribute.minValue']) : null,
+        maxValue: attribute['number_attribute.maxValue'] ? parseFloat(attribute['number_attribute.maxValue']) : null,
+        decimals: attribute['number_attribute.decimals'] ? parseInt(attribute['number_attribute.decimals'], 10) : null,
+      });
+    } else if (attribute.attributeTypeId === AttributeType.JSON) {
+      return plainToInstance(JsonAttributeDbo, {
+        ...baseProperties,
+        schema: attribute['json_attribute.schema'],
+      });
+    } else {
+      return plainToInstance(AttributeDbo, baseProperties);
+    }
   }
 
   public async getByName(catalogId: string, name: string) {

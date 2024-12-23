@@ -374,7 +374,8 @@ export class BaseTables1720373216667 implements MigrationInterface {
           },
           {
             name: 'external_id',
-            type: 'uuid',
+            type: 'varchar',
+            length: '256',
             isNullable: false,
           },
           {

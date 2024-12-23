@@ -1,7 +1,7 @@
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { BadRequestException, Body, ConflictException, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiTags, getSchemaPath } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiQuery, ApiTags, getSchemaPath } from "@nestjs/swagger";
 import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 import {
   AttributeCreateDto, attributeDboToAttributeDto,
@@ -87,19 +87,25 @@ export class AttributesController {
   }
 
   @Get()
+  @ApiQuery({
+    name: 'include',
+    required: false,
+  })
   public async List(
-    @Query('include') include: Array<string>,
+    @Query('include') include?: Array<string>,
   ) {
     const attributes = await this.attributeService.list();
 
     return Promise.all(attributes.map(async (attribute) => {
       const mappedAttribute = attributeDboToAttributeDto(attribute);
-      const localizations = await this.attributeLocalizationService.listLocalizationsByAttributeId(attribute.id);
 
-      return {
-        ...mappedAttribute,
-        localizations: localizations.map(AttributeLocalizationDto.FromDbo),
+      if (include?.includes('localizations')) {
+        const localizations = await this.attributeLocalizationService.listLocalizationsByAttributeId(attribute.id);
+
+        mappedAttribute.localizations = localizations.map(AttributeLocalizationDto.FromDbo);
       }
+
+      return mappedAttribute;
     }));
   }
 

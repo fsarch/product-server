@@ -7,6 +7,7 @@ import { NumberAttribute } from "../../database/entities/number_attribute.entity
 import { BooleanAttribute } from "../../database/entities/boolean_attribute.entity.js";
 import { ListAttribute } from "../../database/entities/list_attribute.entity.js";
 import { JsonAttribute } from "../../database/entities/json_attribute.entity.js";
+import { ListAttributeElement } from "../../database/entities/list_attribute_element.entity.js";
 
 @Module({
   providers: [AttributeService],
@@ -19,6 +20,7 @@ import { JsonAttribute } from "../../database/entities/json_attribute.entity.js"
       BooleanAttribute,
       ListAttribute,
       JsonAttribute,
+      ListAttributeElement,
     ]),
   ],
 })
