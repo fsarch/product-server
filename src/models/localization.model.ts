@@ -17,6 +17,7 @@ export class LocalizationDto {
     const catalogDto = new LocalizationDto();
 
     catalogDto.id = catalog.id;
+    catalogDto.name = catalog.name;
     catalogDto.countryCode = catalog.countryCode;
     catalogDto.languageCode = catalog.languageCode;
 

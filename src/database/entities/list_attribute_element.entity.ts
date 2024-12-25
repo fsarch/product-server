@@ -28,6 +28,13 @@ export class ListAttributeElement {
   })
   externalId: string;
 
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: '2048',
+  })
+  name: string;
+
   @CreateDateColumn({
     name: 'creation_time',
   })

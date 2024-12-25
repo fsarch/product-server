@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Public } from "../../../../fsarch/auth/decorators/public.decorator.js";
 import {
@@ -14,9 +14,6 @@ import {
 import {
   AttributeLocalizationService
 } from "../../../../repositories/attribute-localization/attribute-localization.service.js";
-import {
-  ListAttributeElementLocalization
-} from "../../../../database/entities/list_attribute_element_localization.entity.js";
 
 @ApiTags('attribute')
 @Controller({
@@ -34,7 +31,7 @@ export class ElementsController {
 
   @Post()
   public async Post(
-    @Query('attributeId') attributeId: string,
+    @Param('attributeId') attributeId: string,
     @Body() listAttributeElementCreateDto: ListAttributeElementCreateDto,
   ) {
     const attribute = await this.attributeService.get(attributeId);
@@ -56,7 +53,7 @@ export class ElementsController {
     required: false,
   })
   public async List(
-    @Query('attributeId') attributeId: string,
+    @Param('attributeId') attributeId: string,
     @Query('include') include: Array<string>,
   ) {
     const attributeElements = await this.attributeService.listElementsByAttributeId(attributeId);
@@ -75,9 +72,9 @@ export class ElementsController {
 
   @Put(':elementId/localizations/:localizationId')
   public async Put(
-    @Query('attributeId') attributeId: string,
-    @Query('elementId') elementId: string,
-    @Query('localizationId') localizationId: string,
+    @Param('attributeId') attributeId: string,
+    @Param('elementId') elementId: string,
+    @Param('localizationId') localizationId: string,
     @Body() listAttributeElementLocalizationSetDto: ListAttributeElementLocalizationSetDto,
   ) {
     const attribute = await this.attributeService.get(attributeId);
@@ -94,8 +91,8 @@ export class ElementsController {
 
   @Get(':elementId/localizations')
   public async ListLocalizations(
-    @Query('attributeId') attributeId: string,
-    @Query('elementId') elementId: string,
+    @Param('attributeId') attributeId: string,
+    @Param('elementId') elementId: string,
   ) {
     const attribute = await this.attributeService.get(attributeId);
     if (attribute.attributeTypeId !== AttributeType.LIST) {

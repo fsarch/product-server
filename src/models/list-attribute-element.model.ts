@@ -6,6 +6,9 @@ export class ListAttributeElementCreateDto {
   @ApiProperty()
   @ApiPropertyOptional()
   public externalId?: string;
+
+  @ApiProperty()
+  public name: string;
 }
 
 export class ListAttributeElementDto {
@@ -14,6 +17,7 @@ export class ListAttributeElementDto {
 
     listAttributeElementDto.id = listAttributeElement.id;
     listAttributeElementDto.externalId = listAttributeElement.externalId;
+    listAttributeElementDto.name = listAttributeElement.name;
 
     return listAttributeElementDto;
   }
@@ -23,6 +27,9 @@ export class ListAttributeElementDto {
 
   @ApiProperty()
   externalId: string;
+
+  @ApiProperty()
+  name: string;
 
   @ApiProperty()
   localizations: Array<ListAttributeElementLocalizationDto>;

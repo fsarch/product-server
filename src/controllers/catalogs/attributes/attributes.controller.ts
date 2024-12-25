@@ -109,12 +109,36 @@ export class AttributesController {
     }));
   }
 
+  @Get(':attributeId')
+  @ApiQuery({
+    name: 'include',
+    required: false,
+  })
+  public async Get(
+    @Param('attributeId') attributeId: string,
+    @Query('include') include?: Array<string>,
+  ) {
+    const attribute = await this.attributeService.get(attributeId);
+
+    const mappedAttribute = attributeDboToAttributeDto(attribute);
+
+    if (include?.includes('localizations')) {
+      const localizations = await this.attributeLocalizationService.listLocalizationsByAttributeId(attribute.id);
+
+      mappedAttribute.localizations = localizations.map(AttributeLocalizationDto.FromDbo);
+    }
+
+    return mappedAttribute;
+  }
+
   @Put(':attributeId/localizations/:localizationId')
   public async SetLocalization(
     @Param('attributeId') attributeId: string,
     @Param('localizationId') localizationId: string,
     @Body() attributeLocalizationSetDto: AttributeLocalizationSetDto,
   ) {
-    await this.attributeLocalizationService.setLocalization(attributeId, localizationId, attributeLocalizationSetDto);
+    const attributeLocalization = await this.attributeLocalizationService.setLocalization(attributeId, localizationId, attributeLocalizationSetDto);
+    
+    return AttributeLocalizationDto.FromDbo(attributeLocalization);
   }
 }
