@@ -31,7 +31,7 @@ export class AttributeItemType {
     name: 'is_required',
     type: 'boolean',
   })
-  isRequired: string;
+  isRequired: boolean;
 
   @CreateDateColumn({
     name: 'creation_time',
