@@ -92,9 +92,10 @@ export class AttributesController {
     required: false,
   })
   public async List(
+    @Param('catalogId') catalogId: string,
     @Query('include') include?: Array<string>,
   ) {
-    const attributes = await this.attributeService.list();
+    const attributes = await this.attributeService.list(catalogId);
 
     return Promise.all(attributes.map(async (attribute) => {
       const mappedAttribute = attributeDboToAttributeDto(attribute);
@@ -138,7 +139,7 @@ export class AttributesController {
     @Body() attributeLocalizationSetDto: AttributeLocalizationSetDto,
   ) {
     const attributeLocalization = await this.attributeLocalizationService.setLocalization(attributeId, localizationId, attributeLocalizationSetDto);
-    
+
     return AttributeLocalizationDto.FromDbo(attributeLocalization);
   }
 }

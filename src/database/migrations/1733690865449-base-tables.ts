@@ -131,31 +131,31 @@ export class BaseTables1720373216667 implements MigrationInterface {
     await queryRunner.manager.insert('attribute_type', {
       id: AttributeType.NUMBER,
       name: 'Number',
-      externalId: 'system.number',
+      externalId: '$system.number',
     });
 
     await queryRunner.manager.insert('attribute_type', {
       id: AttributeType.TEXT,
       name: 'Text',
-      externalId: 'system.text',
+      externalId: '$system.text',
     });
 
     await queryRunner.manager.insert('attribute_type', {
       id: AttributeType.BOOLEAN,
       name: 'Boolean',
-      externalId: 'system.boolean',
+      externalId: '$system.boolean',
     });
 
     await queryRunner.manager.insert('attribute_type', {
       id: AttributeType.JSON,
       name: 'JSON',
-      externalId: 'system.json',
+      externalId: '$system.json',
     });
 
     await queryRunner.manager.insert('attribute_type', {
       id: AttributeType.LIST,
       name: 'List',
-      externalId: 'system.list',
+      externalId: '$system.list',
     });
     // endregion
 

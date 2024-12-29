@@ -27,6 +27,9 @@ import { ControllersModule } from './controllers/controllers.module.js';
 import { RepositoriesModule } from './repositories/repositories.module.js';
 import { TextAttribute } from "./database/entities/text_attribute.entity.js";
 import { NumberAttribute } from "./database/entities/number_attribute.entity.js";
+import { ItemBooleanAttribute } from "./database/entities/item_boolean_attribute.entity.js";
+import { ItemTextAttribute } from "./database/entities/item_text_attribute.entity.js";
+import { ItemNumberAttribute } from "./database/entities/item_number_attribute.entity.js";
 
 @Module({
   imports: [
@@ -51,6 +54,9 @@ import { NumberAttribute } from "./database/entities/number_attribute.entity.js"
           Localization,
           TextAttribute,
           NumberAttribute,
+          ItemBooleanAttribute,
+          ItemTextAttribute,
+          ItemNumberAttribute,
         ],
         migrations: [
           BaseTables1720373216667,

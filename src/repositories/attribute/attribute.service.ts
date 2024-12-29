@@ -136,7 +136,7 @@ export class AttributeService {
     };
   }
 
-  public async list() {
+  public async list(catalogId: string) {
     const list = await this.attributeRepository.createQueryBuilder('a')
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
@@ -150,6 +150,9 @@ export class AttributeService {
       .addSelect('na.decimals', 'number_attribute.decimals')
       .addSelect('ja.schema', 'json_attribute.schema')
       .addSelect('a.attribute_type_id', 'attributeTypeId')
+      .where({
+        catalogId,
+      })
       .orderBy('a.name')
       .execute();
 
@@ -181,11 +184,38 @@ export class AttributeService {
     return this.mapAttribute(item[0]);
   }
 
-  private mapAttribute(attribute: any) {
+  public async GetByExternalId(catalogId: string, externalId: string) {
+    const item = await this.attributeRepository.createQueryBuilder('a')
+      .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
+      .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
+      .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
+      .select('a.id', 'id')
+      .addSelect('a.name', 'name')
+      .addSelect('ta.min_length', 'text_attribute.minLength')
+      .addSelect('ta.max_length', 'text_attribute.maxLength')
+      .addSelect('na.min_value', 'number_attribute.minValue')
+      .addSelect('na.max_value', 'number_attribute.maxValue')
+      .addSelect('na.decimals', 'number_attribute.decimals')
+      .addSelect('ja.schema', 'json_attribute.schema')
+      .addSelect('a.attribute_type_id', 'attributeTypeId')
+      .where('a.external_id = :externalId', { externalId })
+      .andWhere('a.catalog_id = :catalogId', { catalogId })
+      .limit(1)
+      .execute();
+
+    if (!item.length) {
+      return null;
+    }
+
+    return this.mapAttribute(item[0]);
+  }
+
+  public mapAttribute(attribute: any) {
     const baseProperties = {
       id: attribute.id,
       name: attribute.name,
       attributeTypeId: attribute.attributeTypeId,
+      externalId: attribute.externalId,
     };
 
     if (attribute.attributeTypeId === AttributeType.TEXT) {

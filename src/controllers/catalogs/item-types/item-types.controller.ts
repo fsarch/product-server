@@ -6,6 +6,7 @@ import { ItemTypeCreateDto, ItemTypeDto } from "../../../models/item-type.model.
 import { AttributeDto } from "../../../models/attribute.model.js";
 import { AttributeItemTypeDto } from "../../../models/attribute-item-type.model.js";
 import { AttributeItemTypeService } from "../../../repositories/attribute-item-type/attribute-item-type.service.js";
+import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 
 @ApiTags('item-type')
 @Controller({
@@ -17,6 +18,8 @@ import { AttributeItemTypeService } from "../../../repositories/attribute-item-t
 export class ItemTypesController {
   constructor(
     private readonly itemTypeService: ItemTypeService,
+    private readonly attributeItemTypeService: AttributeItemTypeService,
+    private readonly attributeService: AttributeService,
   ) {
   }
 
@@ -34,7 +37,17 @@ export class ItemTypesController {
     @Param('catalogId') catalogId: string,
     @Body() itemTypeDto: ItemTypeCreateDto,
   ) {
+    const nameAttribute = await this.attributeService.GetByExternalId(catalogId, '$system.name');
+    if (!nameAttribute) {
+      throw new Error('could not find name attribute');
+    }
+
     const createdItemType = await this.itemTypeService.Create(catalogId, itemTypeDto);
+
+    await this.attributeItemTypeService.Create(createdItemType.id, nameAttribute.id, {
+      isRequired: true,
+      attributeId: nameAttribute.id,
+    });
 
     return {
       id: createdItemType.id,

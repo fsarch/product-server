@@ -166,6 +166,7 @@ export class Item1733694484415 implements MigrationInterface {
             name: 'external_id',
             type: 'varchar',
             length: '256',
+            isNullable: true,
           },
           {
             name: 'creation_time',

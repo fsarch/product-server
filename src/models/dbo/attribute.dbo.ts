@@ -4,4 +4,6 @@ export class AttributeDbo {
   public attributeTypeId: string;
 
   public name: string;
+
+  public externalId: string;
 }

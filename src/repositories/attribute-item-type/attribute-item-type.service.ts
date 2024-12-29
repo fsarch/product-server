@@ -28,6 +28,16 @@ export class AttributeItemTypeService {
       },
     });
   }
+  public async GetByItemTypeAndAttributeId(itemTypeId: string, attributeId: string) {
+    const itemTypeAttributes = await this.attributeItemTypeRepository.find({
+      where: {
+        itemTypeId,
+        attributeId,
+      },
+    });
+
+    return itemTypeAttributes[0];
+  }
 
   public async Create(itemTypeId: string, attributeId: string, createDto: AttributeItemTypeCreateDto): Promise<AttributeItemType> {
     const createdAttributeItemType = this.attributeItemTypeRepository.create({

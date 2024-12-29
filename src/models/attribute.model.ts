@@ -7,11 +7,16 @@ import { TextAttribute } from "../database/entities/text_attribute.entity.js";
 import { NumberAttribute } from "../database/entities/number_attribute.entity.js";
 import { JsonAttribute } from "../database/entities/json_attribute.entity.js";
 import { AttributeLocalizationDto } from "./attribute-localization.model.js";
+import { BooleanAttribute } from "../database/entities/boolean_attribute.entity.js";
 
 export class AttributeCreateDto {
   @ApiProperty()
   @IsString()
   name: string;
+
+  @ApiProperty()
+  @IsString()
+  externalId: string;
 
   @ApiProperty()
   @IsEnum(AttributeType)
@@ -158,6 +163,14 @@ export class NumberAttributeDto extends AttributeDto {
   @ApiProperty()
   @Optional()
   decimals?: number;
+}
+
+export class BooleanAttributeDto extends AttributeDto {
+  public static FromDbo(attribute: Attribute & BooleanAttribute): BooleanAttributeDto {
+    const attributeDto = super.CopyFromDbo(attribute, new BooleanAttributeDto());
+
+    return attributeDto;
+  }
 }
 
 export class JsonAttributeDto extends AttributeDto {
