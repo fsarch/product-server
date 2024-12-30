@@ -13,7 +13,6 @@ import { AttributeService } from "../../../repositories/attribute/attribute.serv
   path: 'catalogs/:catalogId/item-types',
   version: '1',
 })
-@Public()
 @ApiBearerAuth()
 export class ItemTypesController {
   constructor(

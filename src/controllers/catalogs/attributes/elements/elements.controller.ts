@@ -20,7 +20,6 @@ import {
   path: 'catalogs/:catalogId/attributes/:attributeId/elements',
   version: '1',
 })
-@Public()
 @ApiBearerAuth()
 export class ElementsController {
   constructor(

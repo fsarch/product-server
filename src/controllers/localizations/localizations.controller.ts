@@ -9,7 +9,6 @@ import { Public } from "../../fsarch/auth/decorators/public.decorator.js";
   path: 'localizations',
   version: '1',
 })
-@Public()
 @ApiBearerAuth()
 export class LocalizationsController {
   constructor(

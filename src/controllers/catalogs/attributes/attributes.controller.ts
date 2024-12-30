@@ -21,7 +21,6 @@ import {
   path: 'catalogs/:catalogId/attributes',
   version: '1',
 })
-@Public()
 @ApiBearerAuth()
 @ApiExtraModels(NumberAttributeCreateDto)
 @ApiExtraModels(TextAttributeCreateDto)

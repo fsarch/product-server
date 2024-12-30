@@ -9,7 +9,6 @@ import { AttributeItemTypeCreateDto, AttributeItemTypeDto } from "../../../../mo
   path: 'catalogs/:catalogId/item-types/:itemTypeId/attributes',
   version: '1',
 })
-@Public()
 @ApiBearerAuth()
 export class AttributesController {
   constructor(

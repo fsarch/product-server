@@ -12,7 +12,6 @@ import { ItemAttributeService } from "../../../repositories/item-attribute/item-
   path: 'catalogs/:catalogId/items',
   version: '1',
 })
-@Public()
 @ApiBearerAuth()
 export class ItemsController {
   constructor(
