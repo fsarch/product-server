@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ItemService } from "../../../repositories/item/item.service.js";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
@@ -26,8 +26,9 @@ export class ItemsController {
   @Get()
   public async Get(
     @Param('catalogId') catalogId: string,
+    @Query('parentItemId') parentItemId?: string,
   ) {
-    const items = await this.itemService.List(catalogId);
+    const items = await this.itemService.List(catalogId, parentItemId);
 
     return Promise.all(items.map(async (item) => {
       const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);

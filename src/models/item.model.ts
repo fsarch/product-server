@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Item } from "../database/entities/item.entity.js";
-import { Attribute } from "../database/entities/attribute.entity.js";
-import { AttributeType } from "../constants/attribute-type.enum.js";
 import { ItemListAttribute } from "../database/entities/item_list_attribute.entity.js";
 import { ItemTextAttribute } from "../database/entities/item_text_attribute.entity.js";
 import { ItemNumberAttribute } from "../database/entities/item_number_attribute.entity.js";
