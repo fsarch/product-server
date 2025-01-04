@@ -82,6 +82,28 @@ export class ItemAttributeService {
     return await this.itemTextAttributeRepository.save(createdAttribute);
   }
 
+  public async SetTextAttribute(itemId: string, textAttributeId: string, createDto: ItemTextAttributeCreateDto) {
+    let attribute = await this.itemTextAttributeRepository.findOne({
+      where: {
+        itemId,
+        textAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemTextAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        textAttributeId,
+        value: createDto.value,
+      });
+    }
+
+    attribute.value = createDto.value;
+
+    return await this.itemTextAttributeRepository.save(attribute);
+  }
+
   public async CreateBooleanAttribute(itemId: string, booleanAttributeId: string, createDto: ItemBooleanAttributeCreateDto) {
     const createdAttribute = this.itemBooleanAttributeRepository.create({
       id: crypto.randomUUID(),
@@ -91,6 +113,28 @@ export class ItemAttributeService {
     });
 
     return await this.itemBooleanAttributeRepository.save(createdAttribute);
+  }
+
+  public async SetBooleanAttribute(itemId: string, booleanAttributeId: string, createDto: ItemBooleanAttributeCreateDto) {
+    let attribute = await this.itemBooleanAttributeRepository.findOne({
+      where: {
+        itemId,
+        booleanAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemBooleanAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        booleanAttributeId,
+        value: createDto.value,
+      });
+    }
+
+    attribute.value = createDto.value;
+
+    return await this.itemBooleanAttributeRepository.save(attribute);
   }
 
   public async CreateNumberAttribute(itemId: string, numberAttributeId: string, createDto: ItemNumberAttributeCreateDto) {
@@ -104,6 +148,28 @@ export class ItemAttributeService {
     return await this.itemNumberAttributeRepository.save(createdAttribute);
   }
 
+  public async SetNumberAttribute(itemId: string, numberAttributeId: string, createDto: ItemNumberAttributeCreateDto) {
+    let attribute = await this.itemNumberAttributeRepository.findOne({
+      where: {
+        itemId,
+        numberAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemNumberAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        numberAttributeId,
+        value: createDto.value,
+      });
+    }
+
+    attribute.value = createDto.value;
+
+    return await this.itemNumberAttributeRepository.save(attribute);
+  }
+
   public async CreateJsonAttribute(itemId: string, jsonAttributeId: string, createDto: ItemJsonAttributeCreateDto) {
     const createdAttribute = this.itemJsonAttributeRepository.create({
       id: crypto.randomUUID(),
@@ -113,6 +179,28 @@ export class ItemAttributeService {
     });
 
     return await this.itemJsonAttributeRepository.save(createdAttribute);
+  }
+
+  public async SetJsonAttribute(itemId: string, jsonAttributeId: string, createDto: ItemJsonAttributeCreateDto) {
+    let attribute = await this.itemJsonAttributeRepository.findOne({
+      where: {
+        itemId,
+        jsonAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemJsonAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        jsonAttributeId,
+        value: createDto.value,
+      });
+    }
+
+    attribute.value = createDto.value;
+
+    return await this.itemJsonAttributeRepository.save(attribute);
   }
 
   public async CreateListAttribute(itemId: string, listAttributeId: string, createDto: ItemListAttributeCreateDto) {
