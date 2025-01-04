@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ItemService } from "../../../repositories/item/item.service.js";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
 import { ItemCreateDto, ItemDto } from "../../../models/item.model.js";
 import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
@@ -23,6 +23,10 @@ export class ItemsController {
   }
 
   @Get()
+  @ApiQuery({
+    name: 'parentItemId',
+    required: false,
+  })
   public async Get(
     @Param('catalogId') catalogId: string,
     @Query('parentItemId') parentItemId?: string,
