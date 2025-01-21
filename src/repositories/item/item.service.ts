@@ -13,7 +13,7 @@ export class ItemService {
   ) {
   }
 
-  public async List(catalogId: string, parentItemId: string | null = null): Promise<Array<Item & { attributes: Array<ItemAttributeDto<AttributeDto>> }>> {
+  public async List(catalogId: string, parentItemId: string | null = undefined): Promise<Array<Item & { attributes: Array<ItemAttributeDto<AttributeDto>> }>> {
     let itemQueryBuilder = this.itemRepository.createQueryBuilder('i')
       .select('i.id', 'id')
       .addSelect('i.item_type_id', 'itemTypeId')
@@ -22,6 +22,10 @@ export class ItemService {
     if (parentItemId) {
       itemQueryBuilder = itemQueryBuilder
         .andWhere('parent_item_id = :parentItemId', { parentItemId })
+    }
+    if (parentItemId === null) {
+      itemQueryBuilder = itemQueryBuilder
+        .andWhere('parent_item_id IS NULL')
     }
 
     return itemQueryBuilder

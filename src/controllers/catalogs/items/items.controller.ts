@@ -31,7 +31,7 @@ export class ItemsController {
     @Param('catalogId') catalogId: string,
     @Query('parentItemId') parentItemId?: string,
   ) {
-    const items = await this.itemService.List(catalogId, parentItemId);
+    const items = await this.itemService.List(catalogId, parentItemId === 'null' ? null : parentItemId);
 
     return Promise.all(items.map(async (item) => {
       const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);
