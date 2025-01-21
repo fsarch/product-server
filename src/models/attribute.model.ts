@@ -16,6 +16,8 @@ export class AttributeCreateDto {
 
   @ApiProperty()
   @IsString()
+  @IsOptional()
+  @ApiPropertyOptional()
   externalId: string;
 
   @ApiProperty()
