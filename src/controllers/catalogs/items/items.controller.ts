@@ -27,7 +27,7 @@ export class ItemsController {
     name: 'parentItemId',
     required: false,
   })
-  public async Get(
+  public async List(
     @Param('catalogId') catalogId: string,
     @Query('parentItemId') parentItemId?: string,
   ) {
@@ -43,6 +43,23 @@ export class ItemsController {
 
       return itemDto;
     }));
+  }
+
+  @Get(':itemId')
+  public async Get(
+    @Param('catalogId') catalogId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    const item = await this.itemService.Get(itemId);
+
+    const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);
+
+    const itemDto = ItemDto.FromDbo({
+      ...item,
+      attributes,
+    });
+
+    return itemDto;
   }
 
   @Post()
