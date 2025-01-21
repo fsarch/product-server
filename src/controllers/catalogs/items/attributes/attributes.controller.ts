@@ -60,7 +60,7 @@ export class AttributesController {
   ) {
     const attribute = await this.attributeService.get(attributeId);
     const item = await this.itemService.Get(itemId);
-    const itemAttribute = await this.attributeItemTypeService.GetByItemTypeAndAttributeId(item.id, attribute.id);
+    const itemAttribute = await this.attributeItemTypeService.GetByItemTypeAndAttributeId(item.itemTypeId, attribute.id);
     if (!itemAttribute) {
       throw new Error('could not get itemAttribute');
     }
