@@ -203,13 +203,13 @@ export class ItemAttributes1733697377083 implements MigrationInterface {
           referencedTableName: 'list_attribute_element',
         }],
         indices: [{
-          name: 'IDX__item_list_attribute__item_list_attribute_id',
+          name: 'IDX__item_list_attribute_element__item_list_attribute_id',
           columnNames: ['item_list_attribute_id'],
         }, {
-          name: 'IDX__item_list_attribute__list_attribute_element_id',
+          name: 'IDX__item_list_attribute_element__list_attribute_element_id',
           columnNames: ['list_attribute_element_id'],
         }, {
-          name: 'IDX__item_list_attribute__external_id',
+          name: 'IDX__item_list_attribute_element__external_id',
           columnNames: ['external_id'],
         }],
       }),
