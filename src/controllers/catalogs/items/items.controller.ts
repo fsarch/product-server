@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ItemService } from "../../../repositories/item/item.service.js";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
 import { ItemCreateDto, ItemDto } from "../../../models/item.model.js";
 import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 import { AttributeItemTypeService } from "../../../repositories/attribute-item-type/attribute-item-type.service.js";
@@ -86,5 +85,13 @@ export class ItemsController {
     return {
       id: createItem.id,
     };
+  }
+
+  @Delete('/:itemId')
+  public async Delete(
+    @Param('catalogId') catalogId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    await this.itemService.Delete(catalogId, itemId);
   }
 }

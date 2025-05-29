@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Item } from "../../database/entities/item.entity.js";
 import { ItemAttributeDto, ItemCreateDto } from "../../models/item.model.js";
 import { AttributeDto } from "../../models/attribute.model.js";
@@ -32,6 +32,19 @@ export class ItemService {
       .execute();
   }
 
+  public async ListRecursiveFlat(
+    catalogId: string,
+    parentItemId?: string,
+  ) {
+    const items = await this.List(catalogId, parentItemId === 'null' ? null : parentItemId);
+
+    const mappedItems = await Promise.all(items.map(async (item) => {
+      return [item, ...await this.ListRecursiveFlat(catalogId, item.id)];
+    }));
+
+    return mappedItems.flat();
+  }
+
   public async Get(itemId: string): Promise<Item | null> {
     return this.itemRepository.findOne({
       where: {
@@ -50,5 +63,15 @@ export class ItemService {
     });
 
     return await this.itemRepository.save(createdItem);
+  }
+
+  public async Delete(catalogId: string, itemId: string): Promise<void> {
+    const childItems = await this.ListRecursiveFlat(catalogId, itemId);
+    const idsToRemove = childItems.map((i) => i.id);
+    idsToRemove.unshift(itemId);
+
+    await this.itemRepository.softDelete({
+      id: In(idsToRemove),
+    });
   }
 }
