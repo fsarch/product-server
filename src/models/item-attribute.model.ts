@@ -20,5 +20,17 @@ export class ItemJsonAttributeCreateDto {
   value: unknown;
 }
 
+export class ItemListItemAttributeCreateDto {
+  @ApiProperty({
+    type: 'string',
+  })
+  id: string;
+}
+
 export class ItemListAttributeCreateDto {
+  @ApiProperty({
+    type: ItemListItemAttributeCreateDto,
+    isArray: true,
+  })
+  value: Array<ItemListItemAttributeCreateDto>;
 }

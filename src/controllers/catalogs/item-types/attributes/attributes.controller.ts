@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Public } from "../../../../fsarch/auth/decorators/public.decorator.js";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AttributeItemTypeService } from "../../../../repositories/attribute-item-type/attribute-item-type.service.js";
 import { AttributeItemTypeCreateDto, AttributeItemTypeDto } from "../../../../models/attribute-item-type.model.js";
 
@@ -17,10 +16,20 @@ export class AttributesController {
   }
 
   @Get()
+  @ApiQuery({
+    name: 'embed',
+    type: 'string',
+    required: false,
+    isArray: true,
+  })
   public async Get(
+    @Param('catalogId') catalogId: string,
     @Param('itemTypeId') itemTypeId: string,
+    @Param('embed') embed: Array<string>,
   ) {
-    const itemTypes = await this.attributeItemType.ListByItemTypeId(itemTypeId);
+    const itemTypes = await this.attributeItemType.ListByItemTypeId(itemTypeId, {
+      embedAttribute: embed?.includes('attribute'),
+    });
 
     return itemTypes.map(AttributeItemTypeDto.FromDbo);
   }

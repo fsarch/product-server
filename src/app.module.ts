@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { FsarchModule } from './fsarch/fsarch.module.js';
-import { Attribute } from "./database/entities/attribute.entity.js";
+import { Attribute, CompleteAttribute } from "./database/entities/attribute.entity.js";
 import { AttributeItemType } from "./database/entities/attribute_item_type.entity.js";
 import { AttributeLocalization } from "./database/entities/attribute_localization.entity.js";
 import { AttributeType } from "./database/entities/attribute_type.entity.js";
@@ -57,6 +57,7 @@ import { ItemNumberAttribute } from "./database/entities/item_number_attribute.e
           ItemBooleanAttribute,
           ItemTextAttribute,
           ItemNumberAttribute,
+          CompleteAttribute,
         ],
         migrations: [
           BaseTables1720373216667,

@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AttributeService } from "../attribute/attribute.service.js";
 import { AttributeItemTypeService } from "../attribute-item-type/attribute-item-type.service.js";
 import { ItemService } from "../item/item.service.js";
-import { ItemTypeService } from "../item-type/item-type.service.js";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { ItemListAttribute } from "../../database/entities/item_list_attribute.entity.js";
 import { ItemJsonAttribute } from "../../database/entities/item_json_attribute.entity.js";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -16,6 +15,9 @@ import {
   ItemNumberAttributeCreateDto,
   ItemTextAttributeCreateDto
 } from "../../models/item-attribute.model.js";
+import { ItemListAttributeElement } from "../../database/entities/item_list_attribute_element.entity.js";
+import { Attribute } from "../../database/entities/attribute.entity.js";
+import { ListAttribute } from "../../database/entities/list_attribute.entity.js";
 
 @Injectable()
 export class ItemAttributeService {
@@ -25,6 +27,8 @@ export class ItemAttributeService {
     private readonly attributeItemTypeService: AttributeItemTypeService,
     @InjectRepository(ItemListAttribute)
     private readonly itemListAttributeRepository: Repository<ItemListAttribute>,
+    @InjectRepository(ItemListAttributeElement)
+    private readonly itemListAttributeElementRepository: Repository<ItemListAttributeElement>,
     @InjectRepository(ItemJsonAttribute)
     private readonly itemJsonAttributeRepository: Repository<ItemJsonAttribute>,
     @InjectRepository(ItemTextAttribute)
@@ -203,6 +207,60 @@ export class ItemAttributeService {
     return await this.itemJsonAttributeRepository.save(attribute);
   }
 
+  public async SetListAttribute(itemId: string, listAttributeId: string, createDto: ItemListAttributeCreateDto) {
+    console.log('createDto', createDto);
+    let attribute = await this.itemListAttributeRepository.findOne({
+      where: {
+        itemId,
+        listAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemListAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        listAttributeId,
+      });
+
+      attribute = await this.itemListAttributeRepository.save(attribute);
+    }
+
+    const existingAttributeElements = await this.itemListAttributeElementRepository.find({
+      select: {
+        id: true,
+        listAttributeElementId: true,
+      },
+      where: {
+        itemListAttributeId: attribute.id,
+      },
+    });
+
+    console.log('existingAttributeElements', existingAttributeElements);
+
+    const toRemove = existingAttributeElements.filter(({ listAttributeElementId }) => !createDto.value.find(({ id }) => listAttributeElementId === id));
+    const toAdd = createDto.value.filter(({ id }) => !existingAttributeElements.find(({ itemListAttributeId }) => itemListAttributeId === id));
+
+    if (toRemove.length) {
+      await this.itemListAttributeElementRepository.delete({
+        id: In(toRemove.map(({id}) => id)),
+      });
+    }
+
+    if (toAdd.length) {
+      for (let itemListItemAttributeCreateDto of toAdd) {
+        const createdListElement = this.itemListAttributeElementRepository.create({
+          id: crypto.randomUUID(),
+          itemListAttributeId: attribute.id,
+          listAttributeElementId: itemListItemAttributeCreateDto.id,
+        });
+
+        await this.itemListAttributeElementRepository.save(createdListElement);
+      }
+    }
+    console.log('toAdd', toAdd, 'toRemove', toRemove);
+  }
+
   public async CreateListAttribute(itemId: string, listAttributeId: string, createDto: ItemListAttributeCreateDto) {
     const createdAttribute = this.itemListAttributeRepository.create({
       id: crypto.randomUUID(),
@@ -317,22 +375,30 @@ export class ItemAttributeService {
 
   public async ListListAttributes(catalogId: string, itemId: string) {
     const listAttributes = await this.itemListAttributeRepository.createQueryBuilder('ila')
-      .leftJoinAndSelect('attribute', 'a', 'a.id=ila.list_attribute_id')
-      .leftJoinAndSelect('list_attribute', 'la', 'la.id=a.id')
-      .select('a.id', 'id')
-      .addSelect('a.external_id', 'externalId')
-      .addSelect('a.name', 'name')
-      .addSelect('ila.id', 'item_list_attribute.id')
+      .leftJoinAndMapOne('ila.attribute', Attribute, 'a', 'a.id=ila.list_attribute_id')
+      .leftJoinAndMapOne('ila.list_attribute', ListAttribute, 'la', 'la.id=a.id')
+      // .select('a.id', 'id')
+      // .addSelect('a.external_id', 'externalId')
+      // .addSelect('a.name', 'name')
+      // .addSelect('ila.id', 'item_list_attribute.id')
+      .leftJoinAndMapMany('ila.items', ItemListAttributeElement, 'itlae', 'ila.id = itlae.itemListAttributeId')
       .where('a.catalog_id = :catalogId', { catalogId })
       .andWhere('ila.item_id = :itemId', { itemId })
-      .execute();
+      .getMany() as Array<ItemListAttribute & {
+          items: Array<ItemListAttributeElement>;
+          attribute: Attribute;
+          listAttribute: ListAttribute;
+        }>;
+
+    console.log('listAttributes', listAttributes);
 
     return listAttributes.map((listAttribute) => {
-      const attribute = this.attributeService.mapAttribute(listAttribute);
+      const attribute = this.attributeService.mapAttribute(listAttribute.attribute);
 
       return {
-        id: listAttribute['item_list_attribute.id'],
-        value: listAttribute['item_list_attribute.value'],
+        id: listAttribute.id,
+        attributeId: listAttribute.attribute.id,
+        value: listAttribute.items.map(({ listAttributeElementId }) => ({ id: listAttributeElementId })),
         attribute,
       };
     });

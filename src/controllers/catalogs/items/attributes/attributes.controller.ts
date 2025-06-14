@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, Get, Param, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiTags, getSchemaPath } from "@nestjs/swagger";
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiTags, getSchemaPath } from "@nestjs/swagger";
 import { ItemAttributeService } from "../../../../repositories/item-attribute/item-attribute.service.js";
 import { AttributeService } from "../../../../repositories/attribute/attribute.service.js";
 import { ItemService } from "../../../../repositories/item/item.service.js";
@@ -18,6 +18,11 @@ import { validate } from "class-validator";
   path: 'catalogs/:catalogId/items/:itemId/attributes',
   version: '1',
 })
+@ApiExtraModels(ItemTextAttributeCreateDto)
+@ApiExtraModels(ItemBooleanAttributeCreateDto)
+@ApiExtraModels(ItemNumberAttributeCreateDto)
+@ApiExtraModels(ItemJsonAttributeCreateDto)
+@ApiExtraModels(ItemListAttributeCreateDto)
 @ApiBearerAuth()
 export class AttributesController {
   constructor(
@@ -59,6 +64,9 @@ export class AttributesController {
     @Body() createDto: ItemTextAttributeCreateDto | ItemBooleanAttributeCreateDto | ItemNumberAttributeCreateDto | ItemJsonAttributeCreateDto | ItemListAttributeCreateDto,
   ) {
     const attribute = await this.attributeService.get(attributeId);
+    if (!attribute) {
+      throw new NotFoundException('attribute not found');
+    }
     const item = await this.itemService.Get(itemId);
     const itemAttribute = await this.attributeItemTypeService.GetByItemTypeAndAttributeId(item.itemTypeId, attribute.id);
     if (!itemAttribute) {
@@ -109,9 +117,12 @@ export class AttributesController {
         attributeId,
         createDto as ItemBooleanAttributeCreateDto,
       );
+    } else if (attribute.attributeTypeId === AttributeType.LIST) {
+      return this.itemAttributeService.SetListAttribute(
+        itemId,
+        attributeId,
+        createDto as ItemListAttributeCreateDto,
+      );
     }
-    // else if (attribute.attributeTypeId === AttributeType.LIST) {
-    //   attributeCreateDto = plainToInstance(ItemListAttributeCreateDto, createDto);
-    // }
   }
 }

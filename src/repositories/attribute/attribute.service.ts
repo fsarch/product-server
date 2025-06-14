@@ -48,6 +48,7 @@ export class AttributeService {
     const createdAttributeElement = this.listAttributeElementRepository.create({
       id,
       listAttributeId,
+      name: createDto.name,
       externalId: createDto.externalId,
     });
 

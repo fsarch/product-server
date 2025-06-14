@@ -4,6 +4,11 @@ import { AttributeItemType } from "../../database/entities/attribute_item_type.e
 import { InjectRepository } from "@nestjs/typeorm";
 import { AttributeItemTypeCreateDto } from "../../models/attribute-item-type.model.js";
 import * as crypto from "node:crypto";
+import { CompleteAttribute } from "../../database/entities/attribute.entity.js";
+
+type TListOptions = {
+  embedAttribute?: boolean;
+};
 
 @Injectable()
 export class AttributeItemTypeService {
@@ -13,12 +18,18 @@ export class AttributeItemTypeService {
   ) {
   }
 
-  public async ListByItemTypeId(itemTypeId: string) {
-    return this.attributeItemTypeRepository.find({
-      where: {
+  public async ListByItemTypeId(itemTypeId: string, options: TListOptions) {
+    return this.attributeItemTypeRepository.createQueryBuilder('ait')
+      .where({
         itemTypeId,
-      },
-    });
+      })
+      .leftJoinAndMapOne(
+        'ait.attribute',
+        CompleteAttribute,
+        'at',
+        'at.id = ait.attribute_id',
+      )
+      .getMany();
   }
 
   public async ListByAttributeId(attributeId: string) {

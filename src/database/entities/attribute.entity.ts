@@ -2,9 +2,10 @@ import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
-  Entity,
+  Entity, JoinColumn, OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { TextAttribute } from "./text_attribute.entity.js";
 
 @Entity({
   name: 'attribute',
@@ -52,3 +53,13 @@ export class Attribute {
   })
   deletionTime: Date;
 }
+
+@Entity({
+  name: 'attribute',
+})
+export class CompleteAttribute extends Attribute {
+  @OneToOne(() => TextAttribute, { cascade: true })
+  @JoinColumn({ name: 'id' })
+  textAttribute: TextAttribute;
+}
+

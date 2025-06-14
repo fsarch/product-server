@@ -9,6 +9,7 @@ import { ItemBooleanAttribute } from "../../database/entities/item_boolean_attri
 import { ItemModule } from "../item/item.module.js";
 import { AttributeModule } from "../attribute/attribute.module.js";
 import { AttributeItemTypeModule } from "../attribute-item-type/attribute-item-type.module.js";
+import { ItemListAttributeElement } from "../../database/entities/item_list_attribute_element.entity.js";
 
 @Module({
   providers: [ItemAttributeService],
@@ -20,6 +21,7 @@ import { AttributeItemTypeModule } from "../attribute-item-type/attribute-item-t
       ItemTextAttribute,
       ItemNumberAttribute,
       ItemBooleanAttribute,
+      ItemListAttributeElement,
     ]),
     ItemModule,
     AttributeModule,

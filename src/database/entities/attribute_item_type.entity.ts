@@ -5,6 +5,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Attribute } from "./attribute.entity.js";
 
 @Entity({
   name: 'attribute_item_type',
@@ -20,6 +21,8 @@ export class AttributeItemType {
     type: 'uuid',
   })
   attributeId: string;
+
+  attribute?: Attribute;
 
   @Column({
     name: 'item_type_id',
