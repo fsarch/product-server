@@ -30,6 +30,7 @@ import { NumberAttribute } from "./database/entities/number_attribute.entity.js"
 import { ItemBooleanAttribute } from "./database/entities/item_boolean_attribute.entity.js";
 import { ItemTextAttribute } from "./database/entities/item_text_attribute.entity.js";
 import { ItemNumberAttribute } from "./database/entities/item_number_attribute.entity.js";
+import { BooleanAttribute } from "./database/entities/boolean_attribute.entity.js";
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ItemNumberAttribute } from "./database/entities/item_number_attribute.e
           Localization,
           TextAttribute,
           NumberAttribute,
+          BooleanAttribute,
           ItemBooleanAttribute,
           ItemTextAttribute,
           ItemNumberAttribute,
