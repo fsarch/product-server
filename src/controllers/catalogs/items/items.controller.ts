@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseArrayPipe, Post, Query } from '@nestjs/common';
 import { ItemService } from "../../../repositories/item/item.service.js";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ItemCreateDto, ItemDto } from "../../../models/item.model.js";
@@ -29,11 +29,53 @@ export class ItemsController {
   public async List(
     @Param('catalogId') catalogId: string,
     @Query('parentItemId') parentItemId?: string,
+    @Query('itemTypeId', new ParseArrayPipe({ items: String, optional: true })) itemTypeIds?: Array<string>,
+    @Query('filter', new ParseArrayPipe({ items: String, optional: true })) filters?: Array<string>,
   ) {
-    const items = await this.itemService.List(catalogId, parentItemId === 'null' ? null : parentItemId);
+    const items = await this.itemService.List(
+      catalogId,
+      parentItemId === 'null' ? null : parentItemId,
+      {
+        itemTypeIds,
+      }
+    );
 
-    return Promise.all(items.map(async (item) => {
+    const convertedFilters = filters?.map((filter) => {
+      const match = filter.match(/^attribute:([^=]+)=(.+)$/);
+
+      if (!match) {
+        return;
+      }
+
+      return {
+        type: 'attribute',
+        id: match[1],
+        value: match[2],
+      }
+    }).filter(Boolean);
+
+    const mappedItems = await Promise.all(items.map(async (item) => {
       const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);
+
+      if (convertedFilters?.length) {
+        const found = convertedFilters.some((filter) => {
+          return attributes.some(attribute => {
+            if (attribute.attribute.id !== filter.id) {
+              return false;
+            }
+
+            if (attribute.value.toString() !== filter.value) {
+              return false;
+            }
+
+            return true;
+          });
+        });
+
+        if (!found) {
+          return null;
+        }
+      }
 
       const itemDto = ItemDto.FromDbo({
         ...item,
@@ -42,6 +84,8 @@ export class ItemsController {
 
       return itemDto;
     }));
+
+    return mappedItems.filter(Boolean);
   }
 
   @Get(':itemId')

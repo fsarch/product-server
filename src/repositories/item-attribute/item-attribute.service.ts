@@ -18,6 +18,7 @@ import {
 import { ItemListAttributeElement } from "../../database/entities/item_list_attribute_element.entity.js";
 import { Attribute } from "../../database/entities/attribute.entity.js";
 import { ListAttribute } from "../../database/entities/list_attribute.entity.js";
+import { AttributeDbo } from "../../models/dbo/attribute.dbo.js";
 
 @Injectable()
 export class ItemAttributeService {
@@ -404,7 +405,7 @@ export class ItemAttributeService {
     });
   }
 
-  public async ListCompleteByItemId(catalogId: string, itemId: string) {
+  public async ListCompleteByItemId(catalogId: string, itemId: string): Promise<Array<{ id: string; value: unknown; attribute: AttributeDbo }>> {
     const [
       textAttributes,
       numberAttributes,
