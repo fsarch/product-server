@@ -26,6 +26,16 @@ export class ItemsController {
     name: 'parentItemId',
     required: false,
   })
+  @ApiQuery({
+    name: 'itemTypeId',
+    required: false,
+    isArray: true,
+  })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    isArray: true,
+  })
   public async List(
     @Param('catalogId') catalogId: string,
     @Query('parentItemId') parentItemId?: string,
