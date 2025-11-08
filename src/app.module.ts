@@ -31,6 +31,9 @@ import { ItemBooleanAttribute } from "./database/entities/item_boolean_attribute
 import { ItemTextAttribute } from "./database/entities/item_text_attribute.entity.js";
 import { ItemNumberAttribute } from "./database/entities/item_number_attribute.entity.js";
 import { BooleanAttribute } from "./database/entities/boolean_attribute.entity.js";
+import { ImageAttribute1762639425773 } from "./database/migrations/1762639425773-image-attribute.js";
+import { ImageAttribute } from "./database/entities/image_attribute.entity.js";
+import { ItemImageAttribute } from "./database/entities/item_image_attribute.entity.js";
 
 @Module({
   imports: [
@@ -60,6 +63,8 @@ import { BooleanAttribute } from "./database/entities/boolean_attribute.entity.j
           ItemTextAttribute,
           ItemNumberAttribute,
           CompleteAttribute,
+          ImageAttribute,
+          ItemImageAttribute,
         ],
         migrations: [
           BaseTables1720373216667,
@@ -68,6 +73,7 @@ import { BooleanAttribute } from "./database/entities/boolean_attribute.entity.j
           BooleanAttribute1734872207303,
           NumberAttribute1734872605134,
           TextAttribute1734873407457,
+          ImageAttribute1762639425773,
         ],
       },
     }),
