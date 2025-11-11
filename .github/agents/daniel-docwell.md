@@ -1,5 +1,5 @@
 ---
-name: readme-specialist
+name: Daniel Docwell
 description: Specialized agent for creating and improving README files and project documentation
 tools: ['read', 'search', 'edit']
 ---
