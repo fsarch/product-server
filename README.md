@@ -11,7 +11,7 @@ Product Server is designed to manage product catalogs with flexible attribute sy
 - **Localization**: Built-in support for multi-language content
 - **Type Safety**: Full TypeScript implementation with strict typing
 - **RESTful API**: Versioned REST API with automatic OpenAPI/Swagger documentation
-- **Database Flexibility**: Support for PostgreSQL, CockroachDB, and SQLite
+- **Database Flexibility**: Support for PostgreSQL and SQLite
 - **Secure Authentication**: OpenID Connect integration with JWT token validation
 
 ## Prerequisites
@@ -20,10 +20,8 @@ Before you begin, ensure you have the following installed:
 
 - **Node.js** (v20.x or higher)
 - **npm** (v9.x or higher)
-- **Database**: One of the following:
-  - PostgreSQL (v12 or higher)
-  - CockroachDB (v21 or higher)
-  - SQLite (v3 or higher)
+- **Docker** (recommended for running PostgreSQL and Keycloak)
+- **Database**: PostgreSQL (v12 or higher) or SQLite (v3 or higher)
 
 ## Getting Started
 
@@ -141,15 +139,15 @@ Product Server supports multiple database systems. Choose the one that best fits
 
 - **PostgreSQL** (recommended for production and development)
 - **SQLite** (suitable for testing and simple deployments)
-- **CockroachDB** (legacy support - not recommended for new deployments)
+- **CockroachDB** (legacy support - see [ADVANCED.md](ADVANCED.md))
 
 ### PostgreSQL Setup
 
 PostgreSQL is the recommended database for both development and production use.
 
-#### Using Docker (Recommended)
+#### Using Docker
 
-The easiest way to get started with PostgreSQL is using Docker:
+Start PostgreSQL using Docker:
 
 ```bash
 # Start PostgreSQL container
@@ -178,31 +176,6 @@ database:
   database: product_db
 ```
 
-#### Manual Installation (Alternative)
-
-If you prefer to install PostgreSQL directly:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install postgresql postgresql-contrib
-
-# macOS
-brew install postgresql
-```
-
-Then create the database and user:
-
-```bash
-# Connect to PostgreSQL
-sudo -u postgres psql
-
-# Create database and user
-CREATE DATABASE product_db;
-CREATE USER product_user WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE product_db TO product_user;
-\q
-```
-
 #### Production Setup with SSL
 
 For production deployments with SSL/TLS:
@@ -224,53 +197,6 @@ database:
     key:
       path: ./config/certs/client-key.key
 ```
-
-### CockroachDB Setup (Legacy)
-
-**Note**: CockroachDB support is maintained for backward compatibility but is not recommended for new deployments. Please use PostgreSQL instead.
-
-<details>
-<summary>Click to expand CockroachDB setup instructions</summary>
-
-#### Configuration
-
-Add to `config/config.yml`:
-
-```yaml
-database:
-  type: cockroachdb
-  host: localhost
-  port: 26257
-  username: product_user
-  password: secure_password
-  database: product_db
-  ssl:
-    rejectUnauthorized: false
-```
-
-#### Secure Cluster Setup
-
-For production CockroachDB clusters with certificates:
-
-```yaml
-database:
-  type: cockroachdb
-  host: your-cockroach-cluster.com
-  port: 26257
-  username: product_user
-  password: secure_password
-  database: product_db
-  ssl:
-    rejectUnauthorized: true
-    ca:
-      path: ./config/certs/ca.crt
-    cert:
-      path: ./config/certs/client.product_user.crt
-    key:
-      path: ./config/certs/client.product_user.key
-```
-
-</details>
 
 ### SQLite Setup
 
@@ -326,125 +252,38 @@ Product Server supports two authentication methods:
 
 The recommended authentication method uses OpenID Connect with JWT tokens validated against a JWK endpoint.
 
-#### Keycloak Setup
+#### Quick Start with Docker
 
-##### 1. Install and Start Keycloak
+Start Keycloak:
 
 ```bash
-# Using Docker
 docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin \
   quay.io/keycloak/keycloak:latest start-dev
 ```
 
-Access Keycloak admin console at: http://localhost:8080
-
-##### 2. Create a Realm
-
-1. Log in to Keycloak admin console
-2. Click **Create Realm**
-3. Set realm name (e.g., `product-server`)
-4. Click **Create**
-
-##### 3. Create a Client
-
-1. Navigate to **Clients** → **Create client**
-2. Configure the client:
-   - **Client ID**: `product-server-api`
-   - **Client authentication**: ON
-   - **Authorization**: OFF
-   - **Valid redirect URIs**: `http://localhost:3000/*`
-   - **Web origins**: `http://localhost:3000`
-3. Save the client
-
-##### 4. Get Client Credentials
-
-1. Go to the **Credentials** tab
-2. Copy the **Client Secret** (you'll need this for API calls)
-
-##### 5. Create Users
-
-1. Navigate to **Users** → **Add user**
-2. Set username and other details
-3. Save and go to **Credentials** tab
-4. Set a password (disable "Temporary" if needed)
+Or use Docker Compose (see [Deployment](#deployment) section for complete example).
 
 #### Configuration
 
-Add to `config/config.yml`:
+After setting up Keycloak (see [ADVANCED.md](ADVANCED.md) for detailed setup instructions), add to `config/config.yml`:
 
 ```yaml
 auth:
   type: 'jwt-jwk'
   jwkUrl: 'http://localhost:8080/realms/product-server/protocol/openid-connect/certs'
-```
 
-**Important**: The JWK URL follows this pattern:
-```
-{keycloak-base-url}/realms/{realm-name}/protocol/openid-connect/certs
-```
-
-#### User Permissions
-
-Map Keycloak users to permissions in the UAC section:
-
-```yaml
 uac:
   type: 'static'
   users:
-    - user_id: 'keycloak-user-uuid'  # Get this from Keycloak user details
+    - user_id: 'keycloak-user-uuid'
       permissions:
         - manage_claims
         - read_catalogs
-        - write_catalogs
 ```
 
-#### Testing the Setup
+**Note**: The JWK URL pattern is `{keycloak-base-url}/realms/{realm-name}/protocol/openid-connect/certs`
 
-##### 1. Get an Access Token from Keycloak
-
-```bash
-curl -X POST 'http://localhost:8080/realms/product-server/protocol/openid-connect/token' \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'client_id=product-server-api' \
-  -d 'client_secret=YOUR_CLIENT_SECRET' \
-  -d 'username=your-username' \
-  -d 'password=your-password' \
-  -d 'grant_type=password'
-```
-
-This returns a JSON response with an `access_token`.
-
-##### 2. Make an API Request
-
-```bash
-curl -X GET 'http://localhost:3000/v1/catalogs' \
-  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
-```
-
-##### 3. Test with Swagger UI
-
-1. Open http://localhost:3000/docs
-2. Click **Authorize**
-3. Enter: `Bearer YOUR_ACCESS_TOKEN`
-4. Click **Authorize**
-5. Try any API endpoint
-
-#### Troubleshooting
-
-**Issue**: "Unauthorized" error
-
-- **Solution**: Verify the JWK URL is correct and accessible
-- Check that the token is valid and not expired
-- Ensure the user_id in UAC matches the Keycloak user's UUID
-
-**Issue**: "Invalid token signature"
-
-- **Solution**: Ensure the JWK URL points to the correct realm
-- Verify network connectivity to Keycloak server
-
-**Issue**: Token expires too quickly
-
-- **Solution**: In Keycloak, go to **Realm Settings** → **Tokens** and increase the access token lifespan
+For detailed Keycloak setup instructions including realm creation, client configuration, and troubleshooting, see [ADVANCED.md](ADVANCED.md#keycloak-openid-connect-setup).
 
 ### Static Authentication (Development Only)
 
@@ -679,15 +518,15 @@ This project is licensed under UNLICENSED - see the package.json for details.
 For issues and questions:
 
 - Open an issue on GitHub
-- Check existing documentation in the `/docs` folder (if available)
 - Review the Swagger API documentation at http://localhost:3000/docs
+- See [ADVANCED.md](ADVANCED.md) for detailed Keycloak and legacy database configuration
 
 ## Technology Stack
 
 - **Framework**: NestJS
 - **Language**: TypeScript
 - **ORM**: TypeORM
-- **Database Support**: PostgreSQL, CockroachDB, SQLite
+- **Database Support**: PostgreSQL, SQLite
 - **Authentication**: OpenID Connect (JWT/JWK)
 - **API Documentation**: Swagger/OpenAPI
 - **Logging**: Pino
