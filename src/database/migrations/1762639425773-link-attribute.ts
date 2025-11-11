@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { getDataType } from './utils/data-type.mapper.js';
+import { AttributeType } from "../../constants/attribute-type.enum.js";
 
 export class LinkAttribute1762685222868 implements MigrationInterface {
   name = 'LinkAttribute1762685222868';
@@ -178,9 +179,19 @@ export class LinkAttribute1762685222868 implements MigrationInterface {
       }),
     );
     // endregion
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.LINK,
+      name: 'Link',
+      externalId: '$system.link',
+    });
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.manager.delete('attribute_type', {
+      id: AttributeType.LINK,
+    });
+
     await queryRunner.dropTable('item_link_attribute_element');
     await queryRunner.dropTable('item_link_attribute');
     await queryRunner.dropTable('link_attribute');
