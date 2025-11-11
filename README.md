@@ -61,7 +61,12 @@ npm run start:prod
 npm run start:debug
 ```
 
-The server will start on the configured port (default: 3000). Access the API documentation at:
+The server will:
+1. Start on the configured port (default: 3000)
+2. Automatically apply any pending database migrations
+3. Be ready to accept requests
+
+Access the API documentation at:
 - **Swagger UI**: http://localhost:3000/docs
 
 ## Configuration
@@ -134,34 +139,30 @@ Product Server supports multiple database systems. Choose the one that best fits
 
 ### Supported Databases
 
-- **PostgreSQL** (recommended for production)
-- **CockroachDB** (recommended for distributed deployments)
-- **SQLite** (suitable for development and testing)
+- **PostgreSQL** (recommended for production and development)
+- **SQLite** (suitable for testing and simple deployments)
+- **CockroachDB** (legacy support - not recommended for new deployments)
 
 ### PostgreSQL Setup
 
-#### Installation
+PostgreSQL is the recommended database for both development and production use.
+
+#### Using Docker (Recommended)
+
+The easiest way to get started with PostgreSQL is using Docker:
 
 ```bash
-# Ubuntu/Debian
-sudo apt-get install postgresql postgresql-contrib
-
-# macOS
-brew install postgresql
+# Start PostgreSQL container
+docker run -d \
+  --name product-server-postgres \
+  -e POSTGRES_DB=product_db \
+  -e POSTGRES_USER=product_user \
+  -e POSTGRES_PASSWORD=secure_password \
+  -p 5432:5432 \
+  postgres:15
 ```
 
-#### Database Creation
-
-```bash
-# Connect to PostgreSQL
-sudo -u postgres psql
-
-# Create database and user
-CREATE DATABASE product_db;
-CREATE USER product_user WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE product_db TO product_user;
-\q
-```
+Or use Docker Compose (see [Deployment](#deployment) section for complete example).
 
 #### Configuration
 
@@ -177,7 +178,34 @@ database:
   database: product_db
 ```
 
-#### With SSL (Production)
+#### Manual Installation (Alternative)
+
+If you prefer to install PostgreSQL directly:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install postgresql postgresql-contrib
+
+# macOS
+brew install postgresql
+```
+
+Then create the database and user:
+
+```bash
+# Connect to PostgreSQL
+sudo -u postgres psql
+
+# Create database and user
+CREATE DATABASE product_db;
+CREATE USER product_user WITH PASSWORD 'secure_password';
+GRANT ALL PRIVILEGES ON DATABASE product_db TO product_user;
+\q
+```
+
+#### Production Setup with SSL
+
+For production deployments with SSL/TLS:
 
 ```yaml
 database:
@@ -197,24 +225,12 @@ database:
       path: ./config/certs/client-key.key
 ```
 
-### CockroachDB Setup
+### CockroachDB Setup (Legacy)
 
-#### Installation
+**Note**: CockroachDB support is maintained for backward compatibility but is not recommended for new deployments. Please use PostgreSQL instead.
 
-Follow the [CockroachDB installation guide](https://www.cockroachlabs.com/docs/stable/install-cockroachdb.html) for your platform.
-
-#### Database Creation
-
-```bash
-# Connect to CockroachDB
-cockroach sql --insecure
-
-# Create database and user
-CREATE DATABASE product_db;
-CREATE USER product_user WITH PASSWORD 'secure_password';
-GRANT ALL ON DATABASE product_db TO product_user;
-\q
-```
+<details>
+<summary>Click to expand CockroachDB setup instructions</summary>
 
 #### Configuration
 
@@ -254,6 +270,8 @@ database:
       path: ./config/certs/client.product_user.key
 ```
 
+</details>
+
 ### SQLite Setup
 
 SQLite requires no additional installation and is ideal for development.
@@ -270,25 +288,28 @@ database:
 
 The database file will be created automatically if it doesn't exist.
 
-### Running Migrations
+### Database Migrations
 
-After configuring your database, run migrations to create the necessary tables:
+**Database migrations are applied automatically** when the application starts. You don't need to run migrations manually.
+
+The application will:
+1. Check for pending migrations on startup
+2. Apply them automatically to your configured database
+3. Log the migration status
+
+#### Advanced Migration Commands
+
+For development purposes, the following commands are available:
 
 ```bash
-npm run migration:run
-```
-
-### Database Migration Commands
-
-```bash
-# Run pending migrations
-npm run migration:run
-
 # Generate a new migration based on entity changes
-npm run migration:generate -- ./src/database/migrations/MigrationName
+npm run migration:generate -- ./src/database/migrations/YourMigrationName
 
 # Create an empty migration file
 npm run migration:create -- MigrationName
+
+# Manually run pending migrations (optional - runs automatically on startup)
+npm run migration:run
 
 # Revert the last migration
 npm run migration:revert
@@ -534,10 +555,9 @@ When you modify database entities:
 ```bash
 # Generate migration based on entity changes
 npm run migration:generate -- ./src/database/migrations/YourMigrationName
-
-# Run the new migration
-npm run migration:run
 ```
+
+Note: Migrations are applied automatically on application startup.
 
 ## Deployment
 
@@ -561,7 +581,9 @@ docker run -d \
   product-server:latest
 ```
 
-#### Using Docker Compose
+#### Using Docker Compose (Recommended)
+
+The recommended way to run the complete stack with all dependencies:
 
 Create a `docker-compose.yml`:
 
@@ -572,14 +594,15 @@ services:
   product-server:
     build: .
     ports:
-      - "8080:8080"
+      - "3000:3000"
     volumes:
       - ./config:/usr/src/app/config:ro
     environment:
       - NODE_ENV=production
-      - PORT=8080
+      - PORT=3000
     depends_on:
       - postgres
+      - keycloak
 
   postgres:
     image: postgres:15
@@ -592,8 +615,20 @@ services:
     ports:
       - "5432:5432"
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
 volumes:
   postgres_data:
+  keycloak_data:
 ```
 
 Run with:
@@ -601,6 +636,13 @@ Run with:
 ```bash
 docker-compose up -d
 ```
+
+This will start:
+- Product Server on port 3000
+- PostgreSQL on port 5432
+- Keycloak on port 8080
+
+After starting, configure Keycloak as described in the [Authorization](#authorization) section.
 
 ### Production Considerations
 
