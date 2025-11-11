@@ -1,73 +1,652 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Product Server
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A modern, scalable product catalog management server built with [NestJS](https://nestjs.com/). This server provides a RESTful API for managing product catalogs, items, attributes, and localizations with support for multiple database backends and OpenID-based authentication.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Project Purpose
 
-## Description
+Product Server is designed to manage product catalogs with flexible attribute systems and multi-language support. It provides:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Catalog Management**: Create and manage product catalogs with customizable item types
+- **Flexible Attributes**: Support for various attribute types (text, number, boolean, list, JSON, image, link)
+- **Localization**: Built-in support for multi-language content
+- **Type Safety**: Full TypeScript implementation with strict typing
+- **RESTful API**: Versioned REST API with automatic OpenAPI/Swagger documentation
+- **Database Flexibility**: Support for PostgreSQL, CockroachDB, and SQLite
+- **Secure Authentication**: OpenID Connect integration with JWT token validation
 
-## Installation
+## Prerequisites
 
+Before you begin, ensure you have the following installed:
+
+- **Node.js** (v20.x or higher)
+- **npm** (v9.x or higher)
+- **Database**: One of the following:
+  - PostgreSQL (v12 or higher)
+  - CockroachDB (v21 or higher)
+  - SQLite (v3 or higher)
+
+## Getting Started
+
+### Installation
+
+1. Clone the repository:
 ```bash
-$ npm install
+git clone https://github.com/fsarch/product-server.git
+cd product-server
 ```
 
-## Running the app
-
+2. Install dependencies:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Test
-
+3. Create a configuration file:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp config/config.template.yml config/config.yml
 ```
 
-## Support
+4. Edit `config/config.yml` to match your environment (see [Configuration](#configuration) section below)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Running the Application
 
-## Stay in touch
+```bash
+# Development mode (with hot-reload)
+npm run start:dev
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Production mode
+npm run build
+npm run start:prod
+
+# Debug mode
+npm run start:debug
+```
+
+The server will start on the configured port (default: 3000). Access the API documentation at:
+- **Swagger UI**: http://localhost:3000/docs
+
+## Configuration
+
+The application is configured via a YAML file located at `config/config.yml`. A template is provided at `config/config.template.yml`.
+
+### Configuration Structure
+
+The configuration file consists of three main sections:
+
+#### 1. Database Configuration
+
+See the [Databases](#databases) section for detailed setup instructions.
+
+#### 2. Authentication Configuration
+
+See the [Authorization](#authorization) section for detailed setup instructions.
+
+#### 3. User Access Control (UAC)
+
+Define user permissions:
+
+```yaml
+uac:
+  type: 'static'
+  users:
+    - user_id: 'user-unique-id'
+      permissions:
+        - manage_claims
+        - read_catalogs
+        # Add other permissions as needed
+```
+
+### Environment Variables
+
+The following environment variables can be used to override default settings:
+
+- `PORT`: Server port (default: 3000)
+- `NODE_ENV`: Environment mode (`development`, `production`, `test`)
+
+### Configuration File Example
+
+```yaml
+# Database configuration
+database:
+  type: postgres
+  host: localhost
+  port: 5432
+  username: product_user
+  password: secure_password
+  database: product_db
+
+# Authentication configuration
+auth:
+  type: 'jwt-jwk'
+  jwkUrl: 'https://your-keycloak-server/auth/realms/your-realm/protocol/openid-connect/certs'
+
+# User access control
+uac:
+  type: 'static'
+  users:
+    - user_id: 'admin-user-id'
+      permissions:
+        - manage_claims
+```
+
+## Databases
+
+Product Server supports multiple database systems. Choose the one that best fits your infrastructure.
+
+### Supported Databases
+
+- **PostgreSQL** (recommended for production)
+- **CockroachDB** (recommended for distributed deployments)
+- **SQLite** (suitable for development and testing)
+
+### PostgreSQL Setup
+
+#### Installation
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install postgresql postgresql-contrib
+
+# macOS
+brew install postgresql
+```
+
+#### Database Creation
+
+```bash
+# Connect to PostgreSQL
+sudo -u postgres psql
+
+# Create database and user
+CREATE DATABASE product_db;
+CREATE USER product_user WITH PASSWORD 'secure_password';
+GRANT ALL PRIVILEGES ON DATABASE product_db TO product_user;
+\q
+```
+
+#### Configuration
+
+Add to `config/config.yml`:
+
+```yaml
+database:
+  type: postgres
+  host: localhost
+  port: 5432
+  username: product_user
+  password: secure_password
+  database: product_db
+```
+
+#### With SSL (Production)
+
+```yaml
+database:
+  type: postgres
+  host: your-postgres-server.com
+  port: 5432
+  username: product_user
+  password: secure_password
+  database: product_db
+  ssl:
+    rejectUnauthorized: true
+    ca:
+      path: ./config/certs/ca.crt
+    cert:
+      path: ./config/certs/client-cert.crt
+    key:
+      path: ./config/certs/client-key.key
+```
+
+### CockroachDB Setup
+
+#### Installation
+
+Follow the [CockroachDB installation guide](https://www.cockroachlabs.com/docs/stable/install-cockroachdb.html) for your platform.
+
+#### Database Creation
+
+```bash
+# Connect to CockroachDB
+cockroach sql --insecure
+
+# Create database and user
+CREATE DATABASE product_db;
+CREATE USER product_user WITH PASSWORD 'secure_password';
+GRANT ALL ON DATABASE product_db TO product_user;
+\q
+```
+
+#### Configuration
+
+Add to `config/config.yml`:
+
+```yaml
+database:
+  type: cockroachdb
+  host: localhost
+  port: 26257
+  username: product_user
+  password: secure_password
+  database: product_db
+  ssl:
+    rejectUnauthorized: false
+```
+
+#### Secure Cluster Setup
+
+For production CockroachDB clusters with certificates:
+
+```yaml
+database:
+  type: cockroachdb
+  host: your-cockroach-cluster.com
+  port: 26257
+  username: product_user
+  password: secure_password
+  database: product_db
+  ssl:
+    rejectUnauthorized: true
+    ca:
+      path: ./config/certs/ca.crt
+    cert:
+      path: ./config/certs/client.product_user.crt
+    key:
+      path: ./config/certs/client.product_user.key
+```
+
+### SQLite Setup
+
+SQLite requires no additional installation and is ideal for development.
+
+#### Configuration
+
+Add to `config/config.yml`:
+
+```yaml
+database:
+  type: sqlite
+  database: ./example-data/database.sqlite3
+```
+
+The database file will be created automatically if it doesn't exist.
+
+### Running Migrations
+
+After configuring your database, run migrations to create the necessary tables:
+
+```bash
+npm run migration:run
+```
+
+### Database Migration Commands
+
+```bash
+# Run pending migrations
+npm run migration:run
+
+# Generate a new migration based on entity changes
+npm run migration:generate -- ./src/database/migrations/MigrationName
+
+# Create an empty migration file
+npm run migration:create -- MigrationName
+
+# Revert the last migration
+npm run migration:revert
+```
+
+## Authorization
+
+Product Server supports two authentication methods:
+
+1. **JWT with JWK (JSON Web Key)** - OpenID Connect integration (recommended for production)
+2. **Static Authentication** - Simple token-based auth (suitable for development)
+
+### OpenID Connect with Keycloak
+
+The recommended authentication method uses OpenID Connect with JWT tokens validated against a JWK endpoint.
+
+#### Keycloak Setup
+
+##### 1. Install and Start Keycloak
+
+```bash
+# Using Docker
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:latest start-dev
+```
+
+Access Keycloak admin console at: http://localhost:8080
+
+##### 2. Create a Realm
+
+1. Log in to Keycloak admin console
+2. Click **Create Realm**
+3. Set realm name (e.g., `product-server`)
+4. Click **Create**
+
+##### 3. Create a Client
+
+1. Navigate to **Clients** → **Create client**
+2. Configure the client:
+   - **Client ID**: `product-server-api`
+   - **Client authentication**: ON
+   - **Authorization**: OFF
+   - **Valid redirect URIs**: `http://localhost:3000/*`
+   - **Web origins**: `http://localhost:3000`
+3. Save the client
+
+##### 4. Get Client Credentials
+
+1. Go to the **Credentials** tab
+2. Copy the **Client Secret** (you'll need this for API calls)
+
+##### 5. Create Users
+
+1. Navigate to **Users** → **Add user**
+2. Set username and other details
+3. Save and go to **Credentials** tab
+4. Set a password (disable "Temporary" if needed)
+
+#### Configuration
+
+Add to `config/config.yml`:
+
+```yaml
+auth:
+  type: 'jwt-jwk'
+  jwkUrl: 'http://localhost:8080/realms/product-server/protocol/openid-connect/certs'
+```
+
+**Important**: The JWK URL follows this pattern:
+```
+{keycloak-base-url}/realms/{realm-name}/protocol/openid-connect/certs
+```
+
+#### User Permissions
+
+Map Keycloak users to permissions in the UAC section:
+
+```yaml
+uac:
+  type: 'static'
+  users:
+    - user_id: 'keycloak-user-uuid'  # Get this from Keycloak user details
+      permissions:
+        - manage_claims
+        - read_catalogs
+        - write_catalogs
+```
+
+#### Testing the Setup
+
+##### 1. Get an Access Token from Keycloak
+
+```bash
+curl -X POST 'http://localhost:8080/realms/product-server/protocol/openid-connect/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'client_id=product-server-api' \
+  -d 'client_secret=YOUR_CLIENT_SECRET' \
+  -d 'username=your-username' \
+  -d 'password=your-password' \
+  -d 'grant_type=password'
+```
+
+This returns a JSON response with an `access_token`.
+
+##### 2. Make an API Request
+
+```bash
+curl -X GET 'http://localhost:3000/v1/catalogs' \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+##### 3. Test with Swagger UI
+
+1. Open http://localhost:3000/docs
+2. Click **Authorize**
+3. Enter: `Bearer YOUR_ACCESS_TOKEN`
+4. Click **Authorize**
+5. Try any API endpoint
+
+#### Troubleshooting
+
+**Issue**: "Unauthorized" error
+
+- **Solution**: Verify the JWK URL is correct and accessible
+- Check that the token is valid and not expired
+- Ensure the user_id in UAC matches the Keycloak user's UUID
+
+**Issue**: "Invalid token signature"
+
+- **Solution**: Ensure the JWK URL points to the correct realm
+- Verify network connectivity to Keycloak server
+
+**Issue**: Token expires too quickly
+
+- **Solution**: In Keycloak, go to **Realm Settings** → **Tokens** and increase the access token lifespan
+
+### Static Authentication (Development Only)
+
+For development and testing, you can use static authentication:
+
+```yaml
+auth:
+  type: 'static'
+  secret: 'your-secret-key-min-32-chars'
+  users:
+    - id: 'user1'
+      username: 'admin'
+      password: 'admin123'
+```
+
+**Warning**: Do not use static authentication in production environments.
+
+## API Documentation
+
+The Product Server provides a comprehensive REST API with automatic OpenAPI/Swagger documentation.
+
+### Accessing API Documentation
+
+Once the server is running, access the interactive API documentation at:
+
+**Swagger UI**: http://localhost:3000/docs
+
+The Swagger interface provides:
+- Interactive API explorer
+- Request/response schemas
+- Try-it-out functionality
+- Authentication support
+
+### API Versioning
+
+The API uses URI versioning. All endpoints are prefixed with `/v1/`:
+
+- `GET /v1/catalogs` - List catalogs
+- `POST /v1/catalogs` - Create catalog
+- `GET /v1/catalogs/{id}/items` - List items in catalog
+- And more...
+
+### Authentication Headers
+
+Most endpoints require authentication. Include the JWT token in the Authorization header:
+
+```
+Authorization: Bearer YOUR_ACCESS_TOKEN
+```
+
+## Development
+
+### Project Structure
+
+```
+product-server/
+├── config/                 # Configuration files
+│   ├── config.template.yml # Configuration template
+│   └── config.yml         # Your configuration (gitignored)
+├── src/
+│   ├── controllers/       # API controllers
+│   ├── database/          # Database entities and migrations
+│   │   ├── entities/      # TypeORM entities
+│   │   └── migrations/    # Database migrations
+│   ├── fsarch/           # Framework modules
+│   │   ├── auth/         # Authentication
+│   │   ├── database/     # Database module
+│   │   └── uac/          # User access control
+│   ├── models/           # DTOs and models
+│   ├── repositories/     # Data access layer
+│   └── main.ts          # Application entry point
+└── test/                # Tests
+
+```
+
+### Development Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Run in development mode with hot-reload
+npm run start:dev
+
+# Build the project
+npm run build
+
+# Run linter
+npm run lint
+
+# Format code
+npm run format
+
+# Run tests
+npm run test
+
+# Run tests with coverage
+npm run test:cov
+
+# Run end-to-end tests
+npm run test:e2e
+```
+
+### Creating New Migrations
+
+When you modify database entities:
+
+```bash
+# Generate migration based on entity changes
+npm run migration:generate -- ./src/database/migrations/YourMigrationName
+
+# Run the new migration
+npm run migration:run
+```
+
+## Deployment
+
+### Docker Deployment
+
+A Dockerfile is provided for containerized deployments.
+
+#### Build the Docker Image
+
+```bash
+docker build -t product-server:latest .
+```
+
+#### Run the Container
+
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -v $(pwd)/config:/usr/src/app/config:ro \
+  --name product-server \
+  product-server:latest
+```
+
+#### Using Docker Compose
+
+Create a `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  product-server:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config:/usr/src/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product_user
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+```
+
+Run with:
+
+```bash
+docker-compose up -d
+```
+
+### Production Considerations
+
+1. **Environment Variables**: Use environment variables for sensitive configuration
+2. **SSL/TLS**: Enable HTTPS using a reverse proxy (nginx, Caddy)
+3. **Database**: Use a managed database service or properly configured database cluster
+4. **Monitoring**: Implement logging and monitoring solutions
+5. **Backups**: Regular database backups
+6. **Security**: Keep dependencies updated, use security scanning tools
+
+## Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Standards
+
+- Follow the existing code style
+- Run `npm run lint` before committing
+- Write tests for new features
+- Update documentation as needed
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under UNLICENSED - see the package.json for details.
+
+## Support
+
+For issues and questions:
+
+- Open an issue on GitHub
+- Check existing documentation in the `/docs` folder (if available)
+- Review the Swagger API documentation at http://localhost:3000/docs
+
+## Technology Stack
+
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **ORM**: TypeORM
+- **Database Support**: PostgreSQL, CockroachDB, SQLite
+- **Authentication**: OpenID Connect (JWT/JWK)
+- **API Documentation**: Swagger/OpenAPI
+- **Logging**: Pino
+- **Validation**: class-validator, Joi
