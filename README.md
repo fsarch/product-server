@@ -252,20 +252,11 @@ Product Server supports two authentication methods:
 
 The recommended authentication method uses OpenID Connect with JWT tokens validated against a JWK endpoint.
 
-#### Quick Start with Docker
-
-Start Keycloak:
-
-```bash
-docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin \
-  quay.io/keycloak/keycloak:latest start-dev
-```
-
-Or use Docker Compose (see [Deployment](#deployment) section for complete example).
+For complete Keycloak setup instructions, see [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md).
 
 #### Configuration
 
-After setting up Keycloak (see [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md) for detailed setup instructions), add to `config/config.yml`:
+After setting up Keycloak, add to `config/config.yml`:
 
 ```yaml
 auth:
