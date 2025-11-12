@@ -139,7 +139,7 @@ Product Server supports multiple database systems. Choose the one that best fits
 
 - **PostgreSQL** (recommended for production and development)
 - **SQLite** (suitable for testing and simple deployments)
-- **CockroachDB** (legacy support - see [ADVANCED.md](ADVANCED.md))
+- **CockroachDB** (legacy support - see [COCKROACHDB_SETUP.md](COCKROACHDB_SETUP.md))
 
 ### PostgreSQL Setup
 
@@ -265,7 +265,7 @@ Or use Docker Compose (see [Deployment](#deployment) section for complete exampl
 
 #### Configuration
 
-After setting up Keycloak (see [ADVANCED.md](ADVANCED.md) for detailed setup instructions), add to `config/config.yml`:
+After setting up Keycloak (see [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md) for detailed setup instructions), add to `config/config.yml`:
 
 ```yaml
 auth:
@@ -283,7 +283,7 @@ uac:
 
 **Note**: The JWK URL pattern is `{keycloak-base-url}/realms/{realm-name}/protocol/openid-connect/certs`
 
-For detailed Keycloak setup instructions including realm creation, client configuration, and troubleshooting, see [ADVANCED.md](ADVANCED.md#keycloak-openid-connect-setup).
+For detailed Keycloak setup instructions including realm creation, client configuration, user management, testing, and troubleshooting, see [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md).
 
 ### Static Authentication (Development Only)
 
@@ -336,30 +336,9 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
 
 ## Development
 
-### Project Structure
+For detailed development information, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
-```
-product-server/
-├── config/                 # Configuration files
-│   ├── config.template.yml # Configuration template
-│   └── config.yml         # Your configuration (gitignored)
-├── src/
-│   ├── controllers/       # API controllers
-│   ├── database/          # Database entities and migrations
-│   │   ├── entities/      # TypeORM entities
-│   │   └── migrations/    # Database migrations
-│   ├── fsarch/           # Framework modules
-│   │   ├── auth/         # Authentication
-│   │   ├── database/     # Database module
-│   │   └── uac/          # User access control
-│   ├── models/           # DTOs and models
-│   ├── repositories/     # Data access layer
-│   └── main.ts          # Application entry point
-└── test/                # Tests
-
-```
-
-### Development Commands
+### Quick Start
 
 ```bash
 # Install dependencies
@@ -368,35 +347,22 @@ npm install
 # Run in development mode with hot-reload
 npm run start:dev
 
-# Build the project
-npm run build
-
-# Run linter
-npm run lint
-
-# Format code
-npm run format
-
 # Run tests
 npm run test
 
-# Run tests with coverage
-npm run test:cov
-
-# Run end-to-end tests
-npm run test:e2e
+# Run linter
+npm run lint
 ```
 
-### Creating New Migrations
+### Key Development Resources
 
-When you modify database entities:
-
-```bash
-# Generate migration based on entity changes
-npm run migration:generate -- ./src/database/migrations/YourMigrationName
-```
-
-Note: Migrations are applied automatically on application startup.
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Complete developer guide including:
+  - Project structure and architecture
+  - Development commands and workflows
+  - Database migrations
+  - Testing and debugging
+  - API development guidelines
+  - Contributing guidelines
 
 ## Deployment
 
@@ -519,7 +485,12 @@ For issues and questions:
 
 - Open an issue on GitHub
 - Review the Swagger API documentation at http://localhost:3000/docs
-- See [ADVANCED.md](ADVANCED.md) for detailed Keycloak and legacy database configuration
+
+### Documentation
+
+- **[KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md)** - Keycloak setup and troubleshooting
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Developer guide and best practices
+- **[COCKROACHDB_SETUP.md](COCKROACHDB_SETUP.md)** - Legacy CockroachDB configuration
 
 ## Technology Stack
 
