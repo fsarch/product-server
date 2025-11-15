@@ -5,7 +5,7 @@ import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiQuery, ApiTags, getSchemaPat
 import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 import {
   AttributeCreateDto, attributeDboToAttributeDto,
-  AttributeDto, BooleanAttributeCreateDto, JsonAttributeCreateDto, ListAttributeCreateDto,
+  AttributeDto, BooleanAttributeCreateDto, ImageAttributeCreateDto, JsonAttributeCreateDto, LinkAttributeCreateDto, ListAttributeCreateDto,
   NumberAttributeCreateDto,
   TextAttributeCreateDto
 } from "../../../models/attribute.model.js";
@@ -27,6 +27,8 @@ import {
 @ApiExtraModels(JsonAttributeCreateDto)
 @ApiExtraModels(BooleanAttributeCreateDto)
 @ApiExtraModels(ListAttributeCreateDto)
+@ApiExtraModels(LinkAttributeCreateDto)
+@ApiExtraModels(ImageAttributeCreateDto)
 export class AttributesController {
   constructor(
     private readonly attributeService: AttributeService,
@@ -46,14 +48,18 @@ export class AttributesController {
         $ref: getSchemaPath(BooleanAttributeCreateDto),
       }, {
         $ref: getSchemaPath(ListAttributeCreateDto),
+      }, {
+        $ref: getSchemaPath(LinkAttributeCreateDto),
+      }, {
+        $ref: getSchemaPath(ImageAttributeCreateDto),
       }],
     },
   })
   public async Post(
     @Param('catalogId') catalogId: string,
-    @Body() attributeCreateDto: NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto,
+    @Body() attributeCreateDto: NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto | LinkAttributeCreateDto | ImageAttributeCreateDto,
   ) {
-    let type: NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto;
+    let type: NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto | LinkAttributeCreateDto | ImageAttributeCreateDto;
     if (attributeCreateDto.attributeTypeId === AttributeType.NUMBER) {
       type = plainToInstance(NumberAttributeCreateDto, attributeCreateDto);
     } else if (attributeCreateDto.attributeTypeId === AttributeType.TEXT) {
@@ -64,6 +70,10 @@ export class AttributesController {
       type = plainToInstance(BooleanAttributeCreateDto, attributeCreateDto);
     } else if (attributeCreateDto.attributeTypeId === AttributeType.LIST) {
       type = plainToInstance(ListAttributeCreateDto, attributeCreateDto);
+    } else if (attributeCreateDto.attributeTypeId === AttributeType.LINK) {
+      type = plainToInstance(LinkAttributeCreateDto, attributeCreateDto);
+    } else if (attributeCreateDto.attributeTypeId === AttributeType.IMAGE) {
+      type = plainToInstance(ImageAttributeCreateDto, attributeCreateDto);
     } else {
       type = plainToInstance(AttributeCreateDto, attributeCreateDto);
     }

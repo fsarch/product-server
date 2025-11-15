@@ -5,7 +5,7 @@ import { AttributeService } from "../../../../repositories/attribute/attribute.s
 import { ItemService } from "../../../../repositories/item/item.service.js";
 import { AttributeItemTypeService } from "../../../../repositories/attribute-item-type/attribute-item-type.service.js";
 import {
-  ItemBooleanAttributeCreateDto, ItemJsonAttributeCreateDto, ItemListAttributeCreateDto,
+  ItemBooleanAttributeCreateDto, ItemImageAttributeCreateDto, ItemJsonAttributeCreateDto, ItemLinkAttributeCreateDto, ItemListAttributeCreateDto,
   ItemNumberAttributeCreateDto,
   ItemTextAttributeCreateDto
 } from "../../../../models/item-attribute.model.js";
@@ -23,6 +23,8 @@ import { validate } from "class-validator";
 @ApiExtraModels(ItemNumberAttributeCreateDto)
 @ApiExtraModels(ItemJsonAttributeCreateDto)
 @ApiExtraModels(ItemListAttributeCreateDto)
+@ApiExtraModels(ItemLinkAttributeCreateDto)
+@ApiExtraModels(ItemImageAttributeCreateDto)
 @ApiBearerAuth()
 export class AttributesController {
   constructor(
@@ -54,6 +56,10 @@ export class AttributesController {
         $ref: getSchemaPath(ItemJsonAttributeCreateDto),
       }, {
         $ref: getSchemaPath(ItemListAttributeCreateDto),
+      }, {
+        $ref: getSchemaPath(ItemLinkAttributeCreateDto),
+      }, {
+        $ref: getSchemaPath(ItemImageAttributeCreateDto),
       }],
     },
   })
@@ -61,7 +67,7 @@ export class AttributesController {
     @Param('catalogId') catalogId: string,
     @Param('itemId') itemId: string,
     @Param('attributeId') attributeId: string,
-    @Body() createDto: ItemTextAttributeCreateDto | ItemBooleanAttributeCreateDto | ItemNumberAttributeCreateDto | ItemJsonAttributeCreateDto | ItemListAttributeCreateDto,
+    @Body() createDto: ItemTextAttributeCreateDto | ItemBooleanAttributeCreateDto | ItemNumberAttributeCreateDto | ItemJsonAttributeCreateDto | ItemListAttributeCreateDto | ItemLinkAttributeCreateDto | ItemImageAttributeCreateDto,
   ) {
     const attribute = await this.attributeService.get(attributeId);
     if (!attribute) {
@@ -84,6 +90,10 @@ export class AttributesController {
       attributeCreateDto = plainToInstance(ItemBooleanAttributeCreateDto, createDto);
     } else if (attribute.attributeTypeId === AttributeType.LIST) {
       attributeCreateDto = plainToInstance(ItemListAttributeCreateDto, createDto);
+    } else if (attribute.attributeTypeId === AttributeType.LINK) {
+      attributeCreateDto = plainToInstance(ItemLinkAttributeCreateDto, createDto);
+    } else if (attribute.attributeTypeId === AttributeType.IMAGE) {
+      attributeCreateDto = plainToInstance(ItemImageAttributeCreateDto, createDto);
     } else {
       throw new Error('unknown attribute type')
     }
@@ -122,6 +132,18 @@ export class AttributesController {
         itemId,
         attributeId,
         createDto as ItemListAttributeCreateDto,
+      );
+    } else if (attribute.attributeTypeId === AttributeType.LINK) {
+      return this.itemAttributeService.SetLinkAttribute(
+        itemId,
+        attributeId,
+        createDto as ItemLinkAttributeCreateDto,
+      );
+    } else if (attribute.attributeTypeId === AttributeType.IMAGE) {
+      return this.itemAttributeService.SetImageAttribute(
+        itemId,
+        attributeId,
+        createDto as ItemImageAttributeCreateDto,
       );
     }
   }

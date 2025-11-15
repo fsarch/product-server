@@ -6,10 +6,13 @@ import { ItemJsonAttribute } from "../../database/entities/item_json_attribute.e
 import { ItemTextAttribute } from "../../database/entities/item_text_attribute.entity.js";
 import { ItemNumberAttribute } from "../../database/entities/item_number_attribute.entity.js";
 import { ItemBooleanAttribute } from "../../database/entities/item_boolean_attribute.entity.js";
+import { ItemLinkAttribute } from "../../database/entities/item_link_attribute.entity.js";
+import { ItemImageAttribute } from "../../database/entities/item_image_attribute.entity.js";
 import { ItemModule } from "../item/item.module.js";
 import { AttributeModule } from "../attribute/attribute.module.js";
 import { AttributeItemTypeModule } from "../attribute-item-type/attribute-item-type.module.js";
 import { ItemListAttributeElement } from "../../database/entities/item_list_attribute_element.entity.js";
+import { ItemLinkAttributeElement } from "../../database/entities/item_link_attribute_element.entity.js";
 
 @Module({
   providers: [ItemAttributeService],
@@ -21,7 +24,10 @@ import { ItemListAttributeElement } from "../../database/entities/item_list_attr
       ItemTextAttribute,
       ItemNumberAttribute,
       ItemBooleanAttribute,
+      ItemLinkAttribute,
+      ItemImageAttribute,
       ItemListAttributeElement,
+      ItemLinkAttributeElement,
     ]),
     ItemModule,
     AttributeModule,

@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { getDataType } from './utils/data-type.mapper.js';
+import { AttributeType } from "../../constants/attribute-type.enum.js";
 
 export class ImageAttribute1762639425773 implements MigrationInterface {
   name = 'ImageAttribute1762639425773';
@@ -109,9 +110,19 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
       }),
     );
     // endregion
+
+    await queryRunner.manager.insert('attribute_type', {
+      id: AttributeType.IMAGE,
+      name: 'Image',
+      externalId: '$system.image',
+    });
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.manager.delete('attribute_type', {
+      id: AttributeType.IMAGE,
+    });
+
     await queryRunner.dropTable('item_image_attribute');
     await queryRunner.dropTable('image_attribute');
   }
