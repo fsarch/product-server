@@ -120,7 +120,7 @@ export class AttributeService {
   private async createLinkAttribute(id: string, createDto: LinkAttributeCreateDto) {
     const createdAttribute = this.linkAttributeRepository.create({
       id,
-      item_type_id: createDto.itemTypeId,
+      item_type_id: createDto.itemTypeId ?? null,
     });
 
     await this.linkAttributeRepository.save(createdAttribute);

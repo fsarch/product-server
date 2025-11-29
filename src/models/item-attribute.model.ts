@@ -50,7 +50,15 @@ export class ItemLinkAttributeCreateDto {
   value: Array<ItemLinkItemAttributeCreateDto>;
 }
 
-export class ItemImageAttributeCreateDto {
+export class ItemImageAttributeElementCreateDto {
   @ApiProperty()
   imageId: string;
+}
+
+export class ItemImageAttributeCreateDto {
+  @ApiProperty({
+    type: ItemImageAttributeElementCreateDto,
+    isArray: true,
+  })
+  value: Array<ItemImageAttributeElementCreateDto>;
 }

@@ -227,10 +227,10 @@ export class LinkAttributeDto extends AttributeDto {
 }
 
 export class ImageAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & ImageAttribute): ImageAttributeDto {
+  public static FromDbo(attribute: Attribute & { imageAttribute: ImageAttribute }): ImageAttributeDto {
     const attributeDto = super.CopyFromDbo(attribute, new ImageAttributeDto());
 
-    attributeDto.imageServerUrl = attribute.imageServerUrl;
+    attributeDto.imageServerUrl = attribute.imageAttribute.imageServerUrl;
 
     return attributeDto;
   }

@@ -13,7 +13,11 @@ import { ItemLinkAttribute } from "../../database/entities/item_link_attribute.e
 import { ItemImageAttribute } from "../../database/entities/item_image_attribute.entity.js";
 import { AttributeType } from "../../constants/attribute-type.enum.js";
 import {
-  ItemBooleanAttributeCreateDto, ItemImageAttributeCreateDto, ItemJsonAttributeCreateDto, ItemLinkAttributeCreateDto, ItemListAttributeCreateDto,
+  ItemBooleanAttributeCreateDto,
+  ItemImageAttributeCreateDto,
+  ItemJsonAttributeCreateDto,
+  ItemLinkAttributeCreateDto,
+  ItemListAttributeCreateDto,
   ItemNumberAttributeCreateDto,
   ItemTextAttributeCreateDto
 } from "../../models/item-attribute.model.js";
@@ -22,6 +26,7 @@ import { ItemLinkAttributeElement } from "../../database/entities/item_link_attr
 import { Attribute } from "../../database/entities/attribute.entity.js";
 import { ListAttribute } from "../../database/entities/list_attribute.entity.js";
 import { AttributeDbo } from "../../models/dbo/attribute.dbo.js";
+import { ItemImageAttributeElement } from "../../database/entities/item_image_attribute_element.entity.js";
 
 @Injectable()
 export class ItemAttributeService {
@@ -47,6 +52,8 @@ export class ItemAttributeService {
     private readonly itemLinkAttributeElementRepository: Repository<ItemLinkAttributeElement>,
     @InjectRepository(ItemImageAttribute)
     private readonly itemImageAttributeRepository: Repository<ItemImageAttribute>,
+    @InjectRepository(ItemImageAttributeElement)
+    private readonly itemImageAttributeElementRepository: Repository<ItemImageAttributeElement>,
   ) {
   }
 
@@ -256,8 +263,8 @@ export class ItemAttributeService {
 
     console.log('existingAttributeElements', existingAttributeElements);
 
-    const toRemove = existingAttributeElements.filter(({ listAttributeElementId }) => !createDto.value.find(({ id }) => listAttributeElementId === id));
-    const toAdd = createDto.value.filter(({ id }) => !existingAttributeElements.find(({ itemListAttributeId }) => itemListAttributeId === id));
+    const toRemove = existingAttributeElements.filter(({listAttributeElementId}) => !createDto.value.find(({id}) => listAttributeElementId === id));
+    const toAdd = createDto.value.filter(({id}) => !existingAttributeElements.find(({itemListAttributeId}) => itemListAttributeId === id));
 
     if (toRemove.length) {
       await this.itemListAttributeElementRepository.delete({
@@ -307,8 +314,8 @@ export class ItemAttributeService {
       },
     });
 
-    const toRemove = existingAttributeElements.filter(({ linkedItemId }) => !createDto.value.find(({ id }) => linkedItemId === id));
-    const toAdd = createDto.value.filter(({ id }) => !existingAttributeElements.find(({ linkedItemId }) => linkedItemId === id));
+    const toRemove = existingAttributeElements.filter(({linkedItemId}) => !createDto.value.find(({id}) => linkedItemId === id));
+    const toAdd = createDto.value.filter(({id}) => !existingAttributeElements.find(({linkedItemId}) => linkedItemId === id));
 
     if (toRemove.length) {
       await this.itemLinkAttributeElementRepository.delete({
@@ -342,13 +349,22 @@ export class ItemAttributeService {
         id: crypto.randomUUID(),
         itemId,
         imageAttributeId,
-        imageId: createDto.imageId,
       });
     }
 
-    attribute.imageId = createDto.imageId;
+    const savedImageAttribute = await this.itemImageAttributeRepository.save(attribute);
 
-    return await this.itemImageAttributeRepository.save(attribute);
+    if (createDto?.value?.[0]?.imageId) {
+      const createdAttributeElement = this.itemImageAttributeElementRepository.create({
+        id: crypto.randomUUID(),
+        itemImageAttributeId: savedImageAttribute.id,
+        imageId: createDto.value[0].imageId,
+      });
+
+      await this.itemImageAttributeElementRepository.save(createdAttributeElement);
+    }
+
+    return savedImageAttribute;
   }
 
   public async CreateListAttribute(itemId: string, listAttributeId: string, createDto: ItemListAttributeCreateDto) {
@@ -376,10 +392,21 @@ export class ItemAttributeService {
       id: crypto.randomUUID(),
       itemId,
       imageAttributeId,
-      imageId: createDto.imageId,
     });
 
-    return await this.itemImageAttributeRepository.save(createdAttribute);
+    const savedAttribute = await this.itemImageAttributeRepository.save(createdAttribute);
+
+    if (createDto?.value?.[0]?.imageId) {
+      const createdAttributeElement = this.itemImageAttributeElementRepository.create({
+        id: crypto.randomUUID(),
+        itemImageAttributeId: savedAttribute.id,
+        imageId: createDto.value[0].imageId,
+      });
+
+      await this.itemImageAttributeElementRepository.save(createdAttributeElement);
+    }
+
+    return savedAttribute;
   }
 
   public async ListTextAttributes(catalogId: string, itemId: string) {
@@ -393,8 +420,8 @@ export class ItemAttributeService {
       .addSelect('ta.max_length', 'text_attribute.maxLength')
       .addSelect('ita.value', 'item_text_attribute.value')
       .addSelect('ita.id', 'item_text_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ita.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ita.item_id = :itemId', {itemId})
       .execute();
 
     return textAttributes.map((textAttribute) => {
@@ -420,8 +447,8 @@ export class ItemAttributeService {
       .addSelect('na.decimals', 'number_attribute.decimals')
       .addSelect('ina.value', 'item_number_attribute.value')
       .addSelect('ina.id', 'item_number_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ina.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ina.item_id = :itemId', {itemId})
       .execute();
 
     return numberAttributes.map((numberAttribute) => {
@@ -444,8 +471,8 @@ export class ItemAttributeService {
       .addSelect('a.external_id', 'externalId')
       .addSelect('iba.value', 'item_boolean_attribute.value')
       .addSelect('iba.id', 'item_boolean_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('iba.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('iba.item_id = :itemId', {itemId})
       .execute();
 
     return booleanAttributes.map((booleanAttribute) => {
@@ -469,8 +496,8 @@ export class ItemAttributeService {
       .addSelect('ja.schema', 'json_attribute.schema')
       .addSelect('ija.value', 'item_json_attribute.value')
       .addSelect('ija.id', 'item_json_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ija.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ija.item_id = :itemId', {itemId})
       .execute();
 
     return jsonAttributes.map((jsonAttribute) => {
@@ -493,13 +520,13 @@ export class ItemAttributeService {
       // .addSelect('a.name', 'name')
       // .addSelect('ila.id', 'item_list_attribute.id')
       .leftJoinAndMapMany('ila.items', ItemListAttributeElement, 'itlae', 'ila.id = itlae.itemListAttributeId')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ila.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ila.item_id = :itemId', {itemId})
       .getMany() as Array<ItemListAttribute & {
-          items: Array<ItemListAttributeElement>;
-          attribute: Attribute;
-          listAttribute: ListAttribute;
-        }>;
+      items: Array<ItemListAttributeElement>;
+      attribute: Attribute;
+      listAttribute: ListAttribute;
+    }>;
 
     console.log('listAttributes', listAttributes);
 
@@ -509,7 +536,7 @@ export class ItemAttributeService {
       return {
         id: listAttribute.id,
         attributeId: listAttribute.attribute.id,
-        value: listAttribute.items.map(({ listAttributeElementId }) => ({ id: listAttributeElementId })),
+        value: listAttribute.items.map(({listAttributeElementId}) => ({id: listAttributeElementId})),
         attribute,
       };
     });
@@ -519,12 +546,12 @@ export class ItemAttributeService {
     const linkAttributes = await this.itemLinkAttributeRepository.createQueryBuilder('ila')
       .leftJoinAndMapOne('ila.attribute', Attribute, 'a', 'a.id=ila.link_attribute_id')
       .leftJoinAndMapMany('ila.items', ItemLinkAttributeElement, 'ilae', 'ila.id = ilae.itemLinkAttributeId')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ila.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ila.item_id = :itemId', {itemId})
       .getMany() as Array<ItemLinkAttribute & {
-          items: Array<ItemLinkAttributeElement>;
-          attribute: Attribute;
-        }>;
+      items: Array<ItemLinkAttributeElement>;
+      attribute: Attribute;
+    }>;
 
     return linkAttributes.map((linkAttribute) => {
       const attribute = this.attributeService.mapAttribute(linkAttribute.attribute);
@@ -532,7 +559,7 @@ export class ItemAttributeService {
       return {
         id: linkAttribute.id,
         attributeId: linkAttribute.attribute.id,
-        value: linkAttribute.items.map(({ linkedItemId }) => ({ id: linkedItemId })),
+        value: linkAttribute.items.map(({linkedItemId}) => ({id: linkedItemId})),
         attribute,
       };
     });
@@ -540,30 +567,32 @@ export class ItemAttributeService {
 
   public async ListImageAttributes(catalogId: string, itemId: string) {
     const imageAttributes = await this.itemImageAttributeRepository.createQueryBuilder('iia')
-      .leftJoinAndSelect('attribute', 'a', 'a.id=iia.image_attribute_id')
-      .leftJoinAndSelect('image_attribute', 'ia', 'ia.id=a.id')
-      .select('a.id', 'id')
-      .addSelect('a.name', 'name')
-      .addSelect('a.external_id', 'externalId')
-      .addSelect('ia.image_server_url', 'image_attribute.imageServerUrl')
-      .addSelect('iia.image_id', 'item_image_attribute.imageId')
-      .addSelect('iia.id', 'item_image_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('iia.item_id = :itemId', { itemId })
-      .execute();
+      .leftJoinAndMapOne('iia.attribute', Attribute, 'a', 'a.id = iia.image_attribute_id')
+      .leftJoinAndMapMany('iia.items', ItemImageAttributeElement, 'iiae', 'iia.id = iiae.itemImageAttributeId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('iia.item_id = :itemId', {itemId})
+      .getMany() as Array<ItemImageAttribute & {
+      items: Array<ItemImageAttributeElement>;
+      attribute: Attribute;
+    }>;
 
     return imageAttributes.map((imageAttribute) => {
-      const attribute = this.attributeService.mapAttribute(imageAttribute);
+      const attribute = this.attributeService.mapAttribute(imageAttribute.attribute);
 
       return {
-        id: imageAttribute['item_image_attribute.id'],
-        value: imageAttribute['item_image_attribute.imageId'],
+        id: imageAttribute.id,
+        attributeId: imageAttribute.attribute.id,
+        value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({id: imageId})) : [],
         attribute,
       };
     });
   }
 
-  public async ListCompleteByItemId(catalogId: string, itemId: string): Promise<Array<{ id: string; value: unknown; attribute: AttributeDbo }>> {
+  public async ListCompleteByItemId(catalogId: string, itemId: string): Promise<Array<{
+    id: string;
+    value: unknown;
+    attribute: AttributeDbo
+  }>> {
     const [
       textAttributes,
       numberAttributes,

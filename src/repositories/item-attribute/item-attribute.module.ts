@@ -13,6 +13,7 @@ import { AttributeModule } from "../attribute/attribute.module.js";
 import { AttributeItemTypeModule } from "../attribute-item-type/attribute-item-type.module.js";
 import { ItemListAttributeElement } from "../../database/entities/item_list_attribute_element.entity.js";
 import { ItemLinkAttributeElement } from "../../database/entities/item_link_attribute_element.entity.js";
+import { ItemImageAttributeElement } from "../../database/entities/item_image_attribute_element.entity.js";
 
 @Module({
   providers: [ItemAttributeService],
@@ -26,6 +27,7 @@ import { ItemLinkAttributeElement } from "../../database/entities/item_link_attr
       ItemBooleanAttribute,
       ItemLinkAttribute,
       ItemImageAttribute,
+      ItemImageAttributeElement,
       ItemListAttributeElement,
       ItemLinkAttributeElement,
     ]),

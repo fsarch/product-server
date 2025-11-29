@@ -38,6 +38,7 @@ import { LinkAttribute1762685222868 } from "./database/migrations/1762639425773-
 import { LinkAttribute } from "./database/entities/link_attribute.entity.js";
 import { ItemLinkAttributeElement } from "./database/entities/item_link_attribute_element.entity.js";
 import { ItemLinkAttribute } from "./database/entities/item_link_attribute.entity.js";
+import { ItemImageAttributeElement } from "./database/entities/item_image_attribute_element.entity.js";
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { ItemLinkAttribute } from "./database/entities/item_link_attribute.entit
           CompleteAttribute,
           ImageAttribute,
           ItemImageAttribute,
+          ItemImageAttributeElement,
           LinkAttribute,
           ItemLinkAttribute,
           ItemLinkAttributeElement,

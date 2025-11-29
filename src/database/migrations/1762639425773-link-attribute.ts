@@ -22,7 +22,7 @@ export class LinkAttribute1762685222868 implements MigrationInterface {
           {
             name: 'item_type_id',
             type: 'uuid',
-            isNullable: false,
+            isNullable: true,
           },
         ],
         foreignKeys: [{

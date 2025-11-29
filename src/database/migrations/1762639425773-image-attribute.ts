@@ -60,11 +60,6 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'image_id',
-            type: 'uuid',
-            isNullable: false,
-          },
-          {
             name: 'external_id',
             type: 'varchar',
             length: '256',
@@ -111,6 +106,67 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
     );
     // endregion
 
+    // region ItemImageAttributeElement
+    await queryRunner.createTable(
+      new Table({
+        name: 'item_image_attribute_element',
+        columns: [
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            primaryKeyConstraintName: 'pk__item_image_attribute_element',
+          },
+          {
+            name: 'item_image_attribute_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
+            name: 'image_id',
+            type: 'uuid',
+            isNullable: false,
+          },
+          {
+            name: 'external_id',
+            type: 'varchar',
+            length: '256',
+            isNullable: true,
+          },
+          {
+            name: 'creation_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: false,
+            default: 'now()',
+          },
+          {
+            name: 'deletion_time',
+            type: getDataType(databaseType, 'timestamp'),
+            isNullable: true,
+          },
+        ],
+        foreignKeys: [{
+          name: 'fk__item_image_attribute_element__item_image_attribute_id',
+          onUpdate: 'NO ACTION',
+          onDelete: 'NO ACTION',
+          columnNames: ['item_image_attribute_id'],
+          referencedColumnNames: ['id'],
+          referencedTableName: 'item_image_attribute',
+        }],
+        indices: [{
+          name: 'IDX__item_image_attribute_element__item_image_attribute_id',
+          columnNames: ['item_image_attribute_id'],
+        }, {
+          name: 'IDX__item_image_attribute_element__image_id',
+          columnNames: ['image_id'],
+        }, {
+          name: 'IDX__item_image_attribute_element__external_id',
+          columnNames: ['external_id'],
+        }],
+      }),
+    );
+    // endregion
+
     await queryRunner.manager.insert('attribute_type', {
       id: AttributeType.IMAGE,
       name: 'Image',
@@ -125,5 +181,6 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
 
     await queryRunner.dropTable('item_image_attribute');
     await queryRunner.dropTable('image_attribute');
+    await queryRunner.dropTable('image_attribute_element');
   }
 }
