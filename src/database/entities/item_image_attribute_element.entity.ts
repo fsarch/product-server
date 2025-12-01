@@ -41,6 +41,8 @@ export class ItemImageAttributeElement {
 
   @DeleteDateColumn({
     name: 'deletion_time',
+    type: 'timestamptz',
+    nullable: true,
   })
   deletionTime: Date;
 }

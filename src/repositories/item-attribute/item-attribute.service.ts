@@ -318,7 +318,7 @@ export class ItemAttributeService {
     const toAdd = createDto.value.filter(({id}) => !existingAttributeElements.find(({linkedItemId}) => linkedItemId === id));
 
     if (toRemove.length) {
-      await this.itemLinkAttributeElementRepository.delete({
+      await this.itemLinkAttributeElementRepository.softDelete({
         id: In(toRemove.map(({id}) => id)),
       });
     }
@@ -350,21 +350,44 @@ export class ItemAttributeService {
         itemId,
         imageAttributeId,
       });
+
+      attribute = await this.itemImageAttributeRepository.save(attribute);
     }
 
-    const savedImageAttribute = await this.itemImageAttributeRepository.save(attribute);
+    const existingAttributeElements = await this.itemImageAttributeElementRepository.find({
+      select: {
+        id: true,
+        imageId: true,
+      },
+      where: {
+        itemImageAttributeId: attribute.id,
+      },
+    });
 
-    if (createDto?.value?.[0]?.imageId) {
-      const createdAttributeElement = this.itemImageAttributeElementRepository.create({
-        id: crypto.randomUUID(),
-        itemImageAttributeId: savedImageAttribute.id,
-        imageId: createDto.value[0].imageId,
+    const incoming = createDto?.value || [];
+
+    const toRemove = existingAttributeElements.filter(({ imageId }) => !incoming.find(({ imageId: id }) => id === imageId));
+    const toAdd = incoming.filter(({ imageId }) => !existingAttributeElements.find(({ imageId: existingId }) => existingId === imageId));
+
+    if (toRemove.length) {
+      await this.itemImageAttributeElementRepository.delete({
+        id: In(toRemove.map(({ id }) => id)),
       });
-
-      await this.itemImageAttributeElementRepository.save(createdAttributeElement);
     }
 
-    return savedImageAttribute;
+    if (toAdd.length) {
+      for (let elementCreateDto of toAdd) {
+        const createdImageElement = this.itemImageAttributeElementRepository.create({
+          id: crypto.randomUUID(),
+          itemImageAttributeId: attribute.id,
+          imageId: elementCreateDto.imageId,
+        });
+
+        await this.itemImageAttributeElementRepository.save(createdImageElement);
+      }
+    }
+
+    return attribute;
   }
 
   public async CreateListAttribute(itemId: string, listAttributeId: string, createDto: ItemListAttributeCreateDto) {
@@ -396,14 +419,18 @@ export class ItemAttributeService {
 
     const savedAttribute = await this.itemImageAttributeRepository.save(createdAttribute);
 
-    if (createDto?.value?.[0]?.imageId) {
-      const createdAttributeElement = this.itemImageAttributeElementRepository.create({
-        id: crypto.randomUUID(),
-        itemImageAttributeId: savedAttribute.id,
-        imageId: createDto.value[0].imageId,
-      });
+    // Persist all provided image elements (if any)
+    if (createDto?.value && createDto.value.length) {
+      for (const elem of createDto.value) {
+        if (!elem || !elem.imageId) continue;
+        const createdAttributeElement = this.itemImageAttributeElementRepository.create({
+          id: crypto.randomUUID(),
+          itemImageAttributeId: savedAttribute.id,
+          imageId: elem.imageId,
+        });
 
-      await this.itemImageAttributeElementRepository.save(createdAttributeElement);
+        await this.itemImageAttributeElementRepository.save(createdAttributeElement);
+      }
     }
 
     return savedAttribute;
