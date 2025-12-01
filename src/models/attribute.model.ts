@@ -8,6 +8,8 @@ import { NumberAttribute } from "../database/entities/number_attribute.entity.js
 import { JsonAttribute } from "../database/entities/json_attribute.entity.js";
 import { AttributeLocalizationDto } from "./attribute-localization.model.js";
 import { BooleanAttribute } from "../database/entities/boolean_attribute.entity.js";
+import { LinkAttribute } from "../database/entities/link_attribute.entity.js";
+import { ImageAttribute } from "../database/entities/image_attribute.entity.js";
 
 export class AttributeCreateDto {
   @ApiProperty()
@@ -95,7 +97,28 @@ export class ListAttributeCreateDto extends AttributeCreateDto {
   attributeTypeId = AttributeType.LIST;
 }
 
-export type TAttributeCreateDto = NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto;
+export class LinkAttributeCreateDto extends AttributeCreateDto {
+  @ApiProperty()
+  attributeTypeId = AttributeType.LINK;
+
+  @ApiProperty()
+  @ApiPropertyOptional()
+  @Optional()
+  @IsOptional()
+  @IsString()
+  itemTypeId: string;
+}
+
+export class ImageAttributeCreateDto extends AttributeCreateDto {
+  @ApiProperty()
+  attributeTypeId = AttributeType.IMAGE;
+
+  @ApiProperty()
+  @IsString()
+  imageServerUrl: string;
+}
+
+export type TAttributeCreateDto = NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto | LinkAttributeCreateDto | ImageAttributeCreateDto;
 
 export class AttributeDto {
   public static CopyFromDbo<T extends AttributeDto>(attribute: Attribute, attributeDto: T): T {
@@ -189,6 +212,35 @@ export class JsonAttributeDto extends AttributeDto {
   schema?: unknown;
 }
 
+export class LinkAttributeDto extends AttributeDto {
+  public static FromDbo(attribute: Attribute & LinkAttribute): LinkAttributeDto {
+    const attributeDto = super.CopyFromDbo(attribute, new LinkAttributeDto());
+
+    attributeDto.itemTypeId = attribute.item_type_id;
+
+    return attributeDto;
+  }
+
+  @ApiProperty()
+  @Optional()
+  itemTypeId?: string;
+}
+
+export class ImageAttributeDto extends AttributeDto {
+  public static FromDbo(attribute: Attribute & { imageAttribute: ImageAttribute; imageServerUrl?: string; }): ImageAttributeDto {
+    const attributeDto = super.CopyFromDbo(attribute, new ImageAttributeDto());
+
+    // TODO: fix different input models!
+    attributeDto.imageServerUrl = attribute.imageAttribute?.imageServerUrl ?? attribute.imageServerUrl;
+
+    return attributeDto;
+  }
+
+  @ApiProperty()
+  @Optional()
+  imageServerUrl?: string;
+}
+
 export function attributeDboToAttributeDto(attribute: any): AttributeDto {
   if (attribute.attributeTypeId === AttributeType.TEXT) {
     return TextAttributeDto.FromDbo(attribute);
@@ -196,6 +248,10 @@ export function attributeDboToAttributeDto(attribute: any): AttributeDto {
     return NumberAttributeDto.FromDbo(attribute);
   } else if (attribute.attributeTypeId === AttributeType.JSON) {
     return JsonAttributeDto.FromDbo(attribute);
+  } else if (attribute.attributeTypeId === AttributeType.LINK) {
+    return LinkAttributeDto.FromDbo(attribute);
+  } else if (attribute.attributeTypeId === AttributeType.IMAGE) {
+    return ImageAttributeDto.FromDbo(attribute);
   } else {
     return AttributeDto.CopyFromDbo(attribute, new AttributeDto());
   }

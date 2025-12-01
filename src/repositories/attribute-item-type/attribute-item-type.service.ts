@@ -5,6 +5,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AttributeItemTypeCreateDto } from "../../models/attribute-item-type.model.js";
 import * as crypto from "node:crypto";
 import { CompleteAttribute } from "../../database/entities/attribute.entity.js";
+import { TextAttribute } from "../../database/entities/text_attribute.entity.js";
+import { ImageAttribute } from "../../database/entities/image_attribute.entity.js";
 
 type TListOptions = {
   embedAttribute?: boolean;
@@ -28,6 +30,18 @@ export class AttributeItemTypeService {
         CompleteAttribute,
         'at',
         'at.id = ait.attribute_id',
+      )
+      .leftJoinAndMapOne(
+        'at.textAttribute',
+        TextAttribute,
+        'ta',
+        'ta.id = at.id',
+      )
+      .leftJoinAndMapOne(
+        'at.imageAttribute',
+        ImageAttribute,
+        'ia',
+        'ia.id = at.id',
       )
       .getMany();
   }

@@ -7,25 +7,25 @@ import {
 } from 'typeorm';
 
 @Entity({
-  name: 'item_image_attribute',
+  name: 'item_image_attribute_element',
 })
-export class ItemImageAttribute {
+export class ItemImageAttributeElement {
   @PrimaryGeneratedColumn('uuid', {
-    primaryKeyConstraintName: 'pk__item_image_attribute',
+    primaryKeyConstraintName: 'pk__item_image_attribute_element',
   })
   id: string;
 
   @Column({
-    name: 'item_id',
+    name: 'item_image_attribute_id',
     type: 'uuid',
   })
-  itemId: string;
+  itemImageAttributeId: string;
 
   @Column({
-    name: 'image_attribute_id',
+    name: 'image_id',
     type: 'uuid',
   })
-  imageAttributeId: string;
+  imageId: string;
 
   @Column({
     name: 'external_id',
@@ -41,6 +41,8 @@ export class ItemImageAttribute {
 
   @DeleteDateColumn({
     name: 'deletion_time',
+    type: 'timestamptz',
+    nullable: true,
   })
   deletionTime: Date;
 }

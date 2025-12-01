@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Attribute } from "../../database/entities/attribute.entity.js";
 import {
   AttributeCreateDto,
-  BooleanAttributeCreateDto, JsonAttributeCreateDto,
+  BooleanAttributeCreateDto, ImageAttributeCreateDto, JsonAttributeCreateDto, LinkAttributeCreateDto,
   ListAttributeCreateDto,
   NumberAttributeCreateDto, TAttributeCreateDto, TextAttributeCreateDto
 } from "../../models/attribute.model.js";
@@ -13,12 +13,16 @@ import { JsonAttribute } from "../../database/entities/json_attribute.entity.js"
 import { TextAttribute } from "../../database/entities/text_attribute.entity.js";
 import { NumberAttribute } from "../../database/entities/number_attribute.entity.js";
 import { BooleanAttribute } from "../../database/entities/boolean_attribute.entity.js";
+import { LinkAttribute } from "../../database/entities/link_attribute.entity.js";
+import { ImageAttribute } from "../../database/entities/image_attribute.entity.js";
 import { AttributeType } from "../../constants/attribute-type.enum.js";
 import { plainToInstance } from "class-transformer";
 import { AttributeDbo } from "../../models/dbo/attribute.dbo.js";
 import { TextAttributeDbo } from "../../models/dbo/text-attribute.dbo.js";
 import { NumberAttributeDbo } from "../../models/dbo/number-attribute.dbo.js";
 import { JsonAttributeDbo } from "../../models/dbo/json-attribute.dbo.js";
+import { LinkAttributeDbo } from "../../models/dbo/link-attribute.dbo.js";
+import { ImageAttributeDbo } from "../../models/dbo/image-attribute.dbo.js";
 import { ListAttributeElement } from "../../database/entities/list_attribute_element.entity.js";
 import { ListAttributeElementCreateDto } from "../../models/list-attribute-element.model.js";
 
@@ -39,6 +43,10 @@ export class AttributeService {
     private readonly textAttributeRepository: Repository<TextAttribute>,
     @InjectRepository(JsonAttribute)
     private readonly jsonAttributeRepository: Repository<JsonAttribute>,
+    @InjectRepository(LinkAttribute)
+    private readonly linkAttributeRepository: Repository<LinkAttribute>,
+    @InjectRepository(ImageAttribute)
+    private readonly imageAttributeRepository: Repository<ImageAttribute>,
   ) {
   }
 
@@ -109,6 +117,24 @@ export class AttributeService {
     await this.jsonAttributeRepository.save(createdAttribute);
   }
 
+  private async createLinkAttribute(id: string, createDto: LinkAttributeCreateDto) {
+    const createdAttribute = this.linkAttributeRepository.create({
+      id,
+      item_type_id: createDto.itemTypeId ?? null,
+    });
+
+    await this.linkAttributeRepository.save(createdAttribute);
+  }
+
+  private async createImageAttribute(id: string, createDto: ImageAttributeCreateDto) {
+    const createdAttribute = this.imageAttributeRepository.create({
+      id,
+      imageServerUrl: createDto.imageServerUrl,
+    });
+
+    await this.imageAttributeRepository.save(createdAttribute);
+  }
+
   public async create(catalogId: string, attributeCreateDto: TAttributeCreateDto) {
     const id = crypto.randomUUID();
 
@@ -130,6 +156,10 @@ export class AttributeService {
       await this.createTextAttribute(id, attributeCreateDto as TextAttributeCreateDto);
     } else if (attributeCreateDto.attributeTypeId === AttributeType.JSON) {
       await this.createJsonAttribute(id, attributeCreateDto as JsonAttributeCreateDto);
+    } else if (attributeCreateDto.attributeTypeId === AttributeType.LINK) {
+      await this.createLinkAttribute(id, attributeCreateDto as LinkAttributeCreateDto);
+    } else if (attributeCreateDto.attributeTypeId === AttributeType.IMAGE) {
+      await this.createImageAttribute(id, attributeCreateDto as ImageAttributeCreateDto);
     }
 
     return {
@@ -142,6 +172,8 @@ export class AttributeService {
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
       .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
+      .leftJoinAndSelect('link_attribute', 'la', 'la.id=a.id')
+      .leftJoinAndSelect('image_attribute', 'ia', 'ia.id=a.id')
       .select('a.id', 'id')
       .addSelect('a.name', 'name')
       .addSelect('ta.min_length', 'text_attribute.minLength')
@@ -150,6 +182,8 @@ export class AttributeService {
       .addSelect('na.max_value', 'number_attribute.maxValue')
       .addSelect('na.decimals', 'number_attribute.decimals')
       .addSelect('ja.schema', 'json_attribute.schema')
+      .addSelect('la.item_type_id', 'link_attribute.itemTypeId')
+      .addSelect('ia.image_server_url', 'image_attribute.imageServerUrl')
       .addSelect('a.attribute_type_id', 'attributeTypeId')
       .where({
         catalogId,
@@ -165,6 +199,8 @@ export class AttributeService {
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
       .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
+      .leftJoinAndSelect('link_attribute', 'la', 'la.id=a.id')
+      .leftJoinAndSelect('image_attribute', 'ia', 'ia.id=a.id')
       .select('a.id', 'id')
       .addSelect('a.name', 'name')
       .addSelect('ta.min_length', 'text_attribute.minLength')
@@ -173,6 +209,8 @@ export class AttributeService {
       .addSelect('na.max_value', 'number_attribute.maxValue')
       .addSelect('na.decimals', 'number_attribute.decimals')
       .addSelect('ja.schema', 'json_attribute.schema')
+      .addSelect('la.item_type_id', 'link_attribute.itemTypeId')
+      .addSelect('ia.image_server_url', 'image_attribute.imageServerUrl')
       .addSelect('a.attribute_type_id', 'attributeTypeId')
       .where('a.id = :id', { id })
       .limit(1)
@@ -190,6 +228,8 @@ export class AttributeService {
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
       .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
+      .leftJoinAndSelect('link_attribute', 'la', 'la.id=a.id')
+      .leftJoinAndSelect('image_attribute', 'ia', 'ia.id=a.id')
       .select('a.id', 'id')
       .addSelect('a.name', 'name')
       .addSelect('ta.min_length', 'text_attribute.minLength')
@@ -198,6 +238,8 @@ export class AttributeService {
       .addSelect('na.max_value', 'number_attribute.maxValue')
       .addSelect('na.decimals', 'number_attribute.decimals')
       .addSelect('ja.schema', 'json_attribute.schema')
+      .addSelect('la.item_type_id', 'link_attribute.itemTypeId')
+      .addSelect('ia.image_server_url', 'image_attribute.imageServerUrl')
       .addSelect('a.attribute_type_id', 'attributeTypeId')
       .where('a.external_id = :externalId', { externalId })
       .andWhere('a.catalog_id = :catalogId', { catalogId })
@@ -236,6 +278,16 @@ export class AttributeService {
       return plainToInstance(JsonAttributeDbo, {
         ...baseProperties,
         schema: attribute['json_attribute.schema'],
+      });
+    } else if (attribute.attributeTypeId === AttributeType.LINK) {
+      return plainToInstance(LinkAttributeDbo, {
+        ...baseProperties,
+        itemTypeId: attribute['link_attribute.itemTypeId'],
+      });
+    } else if (attribute.attributeTypeId === AttributeType.IMAGE) {
+      return plainToInstance(ImageAttributeDbo, {
+        ...baseProperties,
+        imageServerUrl: attribute['image_attribute.imageServerUrl'],
       });
     } else {
       return plainToInstance(AttributeDbo, baseProperties);

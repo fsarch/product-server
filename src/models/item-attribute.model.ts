@@ -34,3 +34,31 @@ export class ItemListAttributeCreateDto {
   })
   value: Array<ItemListItemAttributeCreateDto>;
 }
+
+export class ItemLinkItemAttributeCreateDto {
+  @ApiProperty({
+    type: 'string',
+  })
+  id: string;
+}
+
+export class ItemLinkAttributeCreateDto {
+  @ApiProperty({
+    type: ItemLinkItemAttributeCreateDto,
+    isArray: true,
+  })
+  value: Array<ItemLinkItemAttributeCreateDto>;
+}
+
+export class ItemImageAttributeElementCreateDto {
+  @ApiProperty()
+  imageId: string;
+}
+
+export class ItemImageAttributeCreateDto {
+  @ApiProperty({
+    type: ItemImageAttributeElementCreateDto,
+    isArray: true,
+  })
+  value: Array<ItemImageAttributeElementCreateDto>;
+}

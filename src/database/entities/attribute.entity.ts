@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TextAttribute } from "./text_attribute.entity.js";
+import { ImageAttribute } from "./image_attribute.entity.js";
 
 @Entity({
   name: 'attribute',
@@ -61,5 +62,9 @@ export class CompleteAttribute extends Attribute {
   @OneToOne(() => TextAttribute, { cascade: true })
   @JoinColumn({ name: 'id' })
   textAttribute: TextAttribute;
+
+  @OneToOne(() => ImageAttribute, { cascade: true })
+  @JoinColumn({ name: 'id' })
+  imageAttribute: ImageAttribute;
 }
 

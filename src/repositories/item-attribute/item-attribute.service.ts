@@ -9,16 +9,24 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ItemTextAttribute } from "../../database/entities/item_text_attribute.entity.js";
 import { ItemNumberAttribute } from "../../database/entities/item_number_attribute.entity.js";
 import { ItemBooleanAttribute } from "../../database/entities/item_boolean_attribute.entity.js";
+import { ItemLinkAttribute } from "../../database/entities/item_link_attribute.entity.js";
+import { ItemImageAttribute } from "../../database/entities/item_image_attribute.entity.js";
 import { AttributeType } from "../../constants/attribute-type.enum.js";
 import {
-  ItemBooleanAttributeCreateDto, ItemJsonAttributeCreateDto, ItemListAttributeCreateDto,
+  ItemBooleanAttributeCreateDto,
+  ItemImageAttributeCreateDto,
+  ItemJsonAttributeCreateDto,
+  ItemLinkAttributeCreateDto,
+  ItemListAttributeCreateDto,
   ItemNumberAttributeCreateDto,
   ItemTextAttributeCreateDto
 } from "../../models/item-attribute.model.js";
 import { ItemListAttributeElement } from "../../database/entities/item_list_attribute_element.entity.js";
+import { ItemLinkAttributeElement } from "../../database/entities/item_link_attribute_element.entity.js";
 import { Attribute } from "../../database/entities/attribute.entity.js";
 import { ListAttribute } from "../../database/entities/list_attribute.entity.js";
 import { AttributeDbo } from "../../models/dbo/attribute.dbo.js";
+import { ItemImageAttributeElement } from "../../database/entities/item_image_attribute_element.entity.js";
 
 @Injectable()
 export class ItemAttributeService {
@@ -38,13 +46,21 @@ export class ItemAttributeService {
     private readonly itemNumberAttributeRepository: Repository<ItemNumberAttribute>,
     @InjectRepository(ItemBooleanAttribute)
     private readonly itemBooleanAttributeRepository: Repository<ItemBooleanAttribute>,
+    @InjectRepository(ItemLinkAttribute)
+    private readonly itemLinkAttributeRepository: Repository<ItemLinkAttribute>,
+    @InjectRepository(ItemLinkAttributeElement)
+    private readonly itemLinkAttributeElementRepository: Repository<ItemLinkAttributeElement>,
+    @InjectRepository(ItemImageAttribute)
+    private readonly itemImageAttributeRepository: Repository<ItemImageAttribute>,
+    @InjectRepository(ItemImageAttributeElement)
+    private readonly itemImageAttributeElementRepository: Repository<ItemImageAttributeElement>,
   ) {
   }
 
   async CreateByItemAttributeId(
     itemId: string,
     attributeId: string,
-    createDto: ItemTextAttributeCreateDto | ItemBooleanAttributeCreateDto | ItemNumberAttributeCreateDto | ItemJsonAttributeCreateDto | ItemListAttributeCreateDto,
+    createDto: ItemTextAttributeCreateDto | ItemBooleanAttributeCreateDto | ItemNumberAttributeCreateDto | ItemJsonAttributeCreateDto | ItemListAttributeCreateDto | ItemLinkAttributeCreateDto | ItemImageAttributeCreateDto,
   ) {
     const attribute = await this.attributeService.get(attributeId);
     const item = await this.itemService.Get(itemId);
@@ -71,6 +87,14 @@ export class ItemAttributeService {
 
     if (attribute.attributeTypeId === AttributeType.LIST) {
       return this.CreateListAttribute(itemId, itemAttribute.id, createDto as ItemListAttributeCreateDto);
+    }
+
+    if (attribute.attributeTypeId === AttributeType.LINK) {
+      return this.CreateLinkAttribute(itemId, itemAttribute.id, createDto as ItemLinkAttributeCreateDto);
+    }
+
+    if (attribute.attributeTypeId === AttributeType.IMAGE) {
+      return this.CreateImageAttribute(itemId, itemAttribute.id, createDto as ItemImageAttributeCreateDto);
     }
 
     throw new Error('invalid attribute type');
@@ -239,8 +263,8 @@ export class ItemAttributeService {
 
     console.log('existingAttributeElements', existingAttributeElements);
 
-    const toRemove = existingAttributeElements.filter(({ listAttributeElementId }) => !createDto.value.find(({ id }) => listAttributeElementId === id));
-    const toAdd = createDto.value.filter(({ id }) => !existingAttributeElements.find(({ itemListAttributeId }) => itemListAttributeId === id));
+    const toRemove = existingAttributeElements.filter(({listAttributeElementId}) => !createDto.value.find(({id}) => listAttributeElementId === id));
+    const toAdd = createDto.value.filter(({id}) => !existingAttributeElements.find(({itemListAttributeId}) => itemListAttributeId === id));
 
     if (toRemove.length) {
       await this.itemListAttributeElementRepository.delete({
@@ -262,6 +286,110 @@ export class ItemAttributeService {
     console.log('toAdd', toAdd, 'toRemove', toRemove);
   }
 
+  public async SetLinkAttribute(itemId: string, linkAttributeId: string, createDto: ItemLinkAttributeCreateDto) {
+    let attribute = await this.itemLinkAttributeRepository.findOne({
+      where: {
+        itemId,
+        linkAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemLinkAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        linkAttributeId,
+      });
+
+      attribute = await this.itemLinkAttributeRepository.save(attribute);
+    }
+
+    const existingAttributeElements = await this.itemLinkAttributeElementRepository.find({
+      select: {
+        id: true,
+        linkedItemId: true,
+      },
+      where: {
+        itemLinkAttributeId: attribute.id,
+      },
+    });
+
+    const toRemove = existingAttributeElements.filter(({linkedItemId}) => !createDto.value.find(({id}) => linkedItemId === id));
+    const toAdd = createDto.value.filter(({id}) => !existingAttributeElements.find(({linkedItemId}) => linkedItemId === id));
+
+    if (toRemove.length) {
+      await this.itemLinkAttributeElementRepository.softDelete({
+        id: In(toRemove.map(({id}) => id)),
+      });
+    }
+
+    if (toAdd.length) {
+      for (let itemLinkItemAttributeCreateDto of toAdd) {
+        const createdLinkElement = this.itemLinkAttributeElementRepository.create({
+          id: crypto.randomUUID(),
+          itemLinkAttributeId: attribute.id,
+          linkedItemId: itemLinkItemAttributeCreateDto.id,
+        });
+
+        await this.itemLinkAttributeElementRepository.save(createdLinkElement);
+      }
+    }
+  }
+
+  public async SetImageAttribute(itemId: string, imageAttributeId: string, createDto: ItemImageAttributeCreateDto) {
+    let attribute = await this.itemImageAttributeRepository.findOne({
+      where: {
+        itemId,
+        imageAttributeId,
+      },
+    });
+
+    if (!attribute) {
+      attribute = this.itemImageAttributeRepository.create({
+        id: crypto.randomUUID(),
+        itemId,
+        imageAttributeId,
+      });
+
+      attribute = await this.itemImageAttributeRepository.save(attribute);
+    }
+
+    const existingAttributeElements = await this.itemImageAttributeElementRepository.find({
+      select: {
+        id: true,
+        imageId: true,
+      },
+      where: {
+        itemImageAttributeId: attribute.id,
+      },
+    });
+
+    const incoming = createDto?.value || [];
+
+    const toRemove = existingAttributeElements.filter(({ imageId }) => !incoming.find(({ imageId: id }) => id === imageId));
+    const toAdd = incoming.filter(({ imageId }) => !existingAttributeElements.find(({ imageId: existingId }) => existingId === imageId));
+
+    if (toRemove.length) {
+      await this.itemImageAttributeElementRepository.delete({
+        id: In(toRemove.map(({ id }) => id)),
+      });
+    }
+
+    if (toAdd.length) {
+      for (let elementCreateDto of toAdd) {
+        const createdImageElement = this.itemImageAttributeElementRepository.create({
+          id: crypto.randomUUID(),
+          itemImageAttributeId: attribute.id,
+          imageId: elementCreateDto.imageId,
+        });
+
+        await this.itemImageAttributeElementRepository.save(createdImageElement);
+      }
+    }
+
+    return attribute;
+  }
+
   public async CreateListAttribute(itemId: string, listAttributeId: string, createDto: ItemListAttributeCreateDto) {
     const createdAttribute = this.itemListAttributeRepository.create({
       id: crypto.randomUUID(),
@@ -270,6 +398,42 @@ export class ItemAttributeService {
     });
 
     return await this.itemListAttributeRepository.save(createdAttribute);
+  }
+
+  public async CreateLinkAttribute(itemId: string, linkAttributeId: string, createDto: ItemLinkAttributeCreateDto) {
+    const createdAttribute = this.itemLinkAttributeRepository.create({
+      id: crypto.randomUUID(),
+      itemId,
+      linkAttributeId,
+    });
+
+    return await this.itemLinkAttributeRepository.save(createdAttribute);
+  }
+
+  public async CreateImageAttribute(itemId: string, imageAttributeId: string, createDto: ItemImageAttributeCreateDto) {
+    const createdAttribute = this.itemImageAttributeRepository.create({
+      id: crypto.randomUUID(),
+      itemId,
+      imageAttributeId,
+    });
+
+    const savedAttribute = await this.itemImageAttributeRepository.save(createdAttribute);
+
+    // Persist all provided image elements (if any)
+    if (createDto?.value && createDto.value.length) {
+      for (const elem of createDto.value) {
+        if (!elem || !elem.imageId) continue;
+        const createdAttributeElement = this.itemImageAttributeElementRepository.create({
+          id: crypto.randomUUID(),
+          itemImageAttributeId: savedAttribute.id,
+          imageId: elem.imageId,
+        });
+
+        await this.itemImageAttributeElementRepository.save(createdAttributeElement);
+      }
+    }
+
+    return savedAttribute;
   }
 
   public async ListTextAttributes(catalogId: string, itemId: string) {
@@ -283,8 +447,8 @@ export class ItemAttributeService {
       .addSelect('ta.max_length', 'text_attribute.maxLength')
       .addSelect('ita.value', 'item_text_attribute.value')
       .addSelect('ita.id', 'item_text_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ita.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ita.item_id = :itemId', {itemId})
       .execute();
 
     return textAttributes.map((textAttribute) => {
@@ -310,8 +474,8 @@ export class ItemAttributeService {
       .addSelect('na.decimals', 'number_attribute.decimals')
       .addSelect('ina.value', 'item_number_attribute.value')
       .addSelect('ina.id', 'item_number_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ina.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ina.item_id = :itemId', {itemId})
       .execute();
 
     return numberAttributes.map((numberAttribute) => {
@@ -334,8 +498,8 @@ export class ItemAttributeService {
       .addSelect('a.external_id', 'externalId')
       .addSelect('iba.value', 'item_boolean_attribute.value')
       .addSelect('iba.id', 'item_boolean_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('iba.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('iba.item_id = :itemId', {itemId})
       .execute();
 
     return booleanAttributes.map((booleanAttribute) => {
@@ -359,8 +523,8 @@ export class ItemAttributeService {
       .addSelect('ja.schema', 'json_attribute.schema')
       .addSelect('ija.value', 'item_json_attribute.value')
       .addSelect('ija.id', 'item_json_attribute.id')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ija.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ija.item_id = :itemId', {itemId})
       .execute();
 
     return jsonAttributes.map((jsonAttribute) => {
@@ -383,13 +547,13 @@ export class ItemAttributeService {
       // .addSelect('a.name', 'name')
       // .addSelect('ila.id', 'item_list_attribute.id')
       .leftJoinAndMapMany('ila.items', ItemListAttributeElement, 'itlae', 'ila.id = itlae.itemListAttributeId')
-      .where('a.catalog_id = :catalogId', { catalogId })
-      .andWhere('ila.item_id = :itemId', { itemId })
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ila.item_id = :itemId', {itemId})
       .getMany() as Array<ItemListAttribute & {
-          items: Array<ItemListAttributeElement>;
-          attribute: Attribute;
-          listAttribute: ListAttribute;
-        }>;
+      items: Array<ItemListAttributeElement>;
+      attribute: Attribute;
+      listAttribute: ListAttribute;
+    }>;
 
     console.log('listAttributes', listAttributes);
 
@@ -399,27 +563,81 @@ export class ItemAttributeService {
       return {
         id: listAttribute.id,
         attributeId: listAttribute.attribute.id,
-        value: listAttribute.items.map(({ listAttributeElementId }) => ({ id: listAttributeElementId })),
+        value: listAttribute.items.map(({listAttributeElementId}) => ({id: listAttributeElementId})),
         attribute,
       };
     });
   }
 
-  public async ListCompleteByItemId(catalogId: string, itemId: string): Promise<Array<{ id: string; value: unknown; attribute: AttributeDbo }>> {
+  public async ListLinkAttributes(catalogId: string, itemId: string) {
+    const linkAttributes = await this.itemLinkAttributeRepository.createQueryBuilder('ila')
+      .leftJoinAndMapOne('ila.attribute', Attribute, 'a', 'a.id=ila.link_attribute_id')
+      .leftJoinAndMapMany('ila.items', ItemLinkAttributeElement, 'ilae', 'ila.id = ilae.itemLinkAttributeId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ila.item_id = :itemId', {itemId})
+      .getMany() as Array<ItemLinkAttribute & {
+      items: Array<ItemLinkAttributeElement>;
+      attribute: Attribute;
+    }>;
+
+    return linkAttributes.map((linkAttribute) => {
+      const attribute = this.attributeService.mapAttribute(linkAttribute.attribute);
+
+      return {
+        id: linkAttribute.id,
+        attributeId: linkAttribute.attribute.id,
+        value: linkAttribute.items.map(({linkedItemId}) => ({id: linkedItemId})),
+        attribute,
+      };
+    });
+  }
+
+  public async ListImageAttributes(catalogId: string, itemId: string) {
+    const imageAttributes = await this.itemImageAttributeRepository.createQueryBuilder('iia')
+      .leftJoinAndMapOne('iia.attribute', Attribute, 'a', 'a.id = iia.image_attribute_id')
+      .leftJoinAndMapMany('iia.items', ItemImageAttributeElement, 'iiae', 'iia.id = iiae.itemImageAttributeId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('iia.item_id = :itemId', {itemId})
+      .getMany() as Array<ItemImageAttribute & {
+      items: Array<ItemImageAttributeElement>;
+      attribute: Attribute;
+    }>;
+
+    return imageAttributes.map((imageAttribute) => {
+      const attribute = this.attributeService.mapAttribute(imageAttribute.attribute);
+
+      return {
+        id: imageAttribute.id,
+        attributeId: imageAttribute.attribute.id,
+        value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({id: imageId})) : [],
+        attribute,
+      };
+    });
+  }
+
+  public async ListCompleteByItemId(catalogId: string, itemId: string): Promise<Array<{
+    id: string;
+    value: unknown;
+    attribute: AttributeDbo
+  }>> {
     const [
       textAttributes,
       numberAttributes,
       booleanAttributes,
       jsonAttributes,
       listAttributes,
+      linkAttributes,
+      imageAttributes,
     ] = await Promise.all([
       this.ListTextAttributes(catalogId, itemId),
       this.ListNumberAttributes(catalogId, itemId),
       this.ListBooleanAttributes(catalogId, itemId),
       this.ListJsonAttributes(catalogId, itemId),
       this.ListListAttributes(catalogId, itemId),
+      this.ListLinkAttributes(catalogId, itemId),
+      this.ListImageAttributes(catalogId, itemId),
     ]);
 
-    return [...textAttributes, ...numberAttributes, ...booleanAttributes, ...jsonAttributes, ...listAttributes];
+    return [...textAttributes, ...numberAttributes, ...booleanAttributes, ...jsonAttributes, ...listAttributes, ...linkAttributes, ...imageAttributes];
   }
 }

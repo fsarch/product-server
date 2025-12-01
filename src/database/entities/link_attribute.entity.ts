@@ -1,7 +1,5 @@
 import {
   Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -20,28 +18,4 @@ export class LinkAttribute {
     type: 'uuid',
   })
   item_type_id: string | null;
-
-  @Column({
-    name: 'external_id',
-    type: 'varchar',
-    length: '256',
-  })
-  externalId: string;
-
-  @Column({
-    name: 'name',
-    type: 'varchar',
-    length: '2048',
-  })
-  name: string;
-
-  @CreateDateColumn({
-    name: 'creation_time',
-  })
-  creationTime: Date;
-
-  @DeleteDateColumn({
-    name: 'deletion_time',
-  })
-  deletionTime: Date;
 }
