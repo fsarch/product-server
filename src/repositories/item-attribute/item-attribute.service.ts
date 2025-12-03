@@ -370,7 +370,7 @@ export class ItemAttributeService {
     const toAdd = incoming.filter(({ imageId }) => !existingAttributeElements.find(({ imageId: existingId }) => existingId === imageId));
 
     if (toRemove.length) {
-      await this.itemImageAttributeElementRepository.delete({
+      await this.itemImageAttributeElementRepository.softDelete({
         id: In(toRemove.map(({ id }) => id)),
       });
     }
@@ -609,7 +609,7 @@ export class ItemAttributeService {
       return {
         id: imageAttribute.id,
         attributeId: imageAttribute.attribute.id,
-        value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({id: imageId})) : [],
+        value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({imageId})) : [],
         attribute,
       };
     });
