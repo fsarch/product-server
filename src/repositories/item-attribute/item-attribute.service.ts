@@ -370,7 +370,7 @@ export class ItemAttributeService {
     const toAdd = incoming.filter(({ imageId }) => !existingAttributeElements.find(({ imageId: existingId }) => existingId === imageId));
 
     if (toRemove.length) {
-      await this.itemImageAttributeElementRepository.delete({
+      await this.itemImageAttributeElementRepository.softDelete({
         id: In(toRemove.map(({ id }) => id)),
       });
     }
