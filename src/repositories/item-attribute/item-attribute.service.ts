@@ -609,7 +609,7 @@ export class ItemAttributeService {
       return {
         id: imageAttribute.id,
         attributeId: imageAttribute.attribute.id,
-        value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({id: imageId})) : [],
+        value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({imageId})) : [],
         attribute,
       };
     });
