@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
 import { ItemTypeService } from "../../../repositories/item-type/item-type.service.js";
 import { ItemTypeCreateDto, ItemTypeDto } from "../../../models/item-type.model.js";
 import { AttributeDto } from "../../../models/attribute.model.js";

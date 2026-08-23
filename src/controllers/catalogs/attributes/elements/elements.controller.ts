@@ -1,6 +1,5 @@
 import { Body, Controller, Get, NotFoundException, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { Public } from "../../../../fsarch/auth/decorators/public.decorator.js";
 import {
   ListAttributeElementCreateDto,
   ListAttributeElementDto

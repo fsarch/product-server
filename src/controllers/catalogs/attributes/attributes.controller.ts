@@ -10,7 +10,6 @@ import {
   TextAttributeCreateDto
 } from "../../../models/attribute.model.js";
 import { AttributeType } from "../../../constants/attribute-type.enum.js";
-import { Public } from "../../../fsarch/auth/decorators/public.decorator.js";
 import { AttributeLocalizationDto, AttributeLocalizationSetDto } from "../../../models/attribute-localization.model.js";
 import {
   AttributeLocalizationService
