@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseArrayPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, ParseArrayPipe, Post, Query } from '@nestjs/common';
 import { ItemService } from "../../../repositories/item/item.service.js";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { ItemCreateDto, ItemDto } from "../../../models/item.model.js";
@@ -104,6 +104,10 @@ export class ItemsController {
     @Param('itemId') itemId: string,
   ) {
     const item = await this.itemService.Get(itemId);
+
+    if (!item) {
+      throw new NotFoundException();
+    }
 
     const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);
 
