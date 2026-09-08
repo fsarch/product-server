@@ -64,8 +64,13 @@ export class ItemsController {
       }
     }).filter(Boolean);
 
-    const mappedItems = await Promise.all(items.map(async (item) => {
-      const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);
+    const attributesByItemId = await this.itemAttributeService.ListCompleteByItemIds(
+      catalogId,
+      items.map((item) => item.id),
+    );
+
+    const mappedItems = items.map((item) => {
+      const attributes = attributesByItemId.get(item.id) ?? [];
 
       if (convertedFilters?.length) {
         const found = convertedFilters.some((filter) => {
@@ -93,7 +98,7 @@ export class ItemsController {
       });
 
       return itemDto;
-    }));
+    });
 
     return mappedItems.filter(Boolean);
   }

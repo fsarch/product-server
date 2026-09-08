@@ -640,4 +640,251 @@ export class ItemAttributeService {
 
     return [...textAttributes, ...numberAttributes, ...booleanAttributes, ...jsonAttributes, ...listAttributes, ...linkAttributes, ...imageAttributes];
   }
+
+  public async ListTextAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const textAttributes = await this.itemTextAttributeRepository.createQueryBuilder('ita')
+      .leftJoinAndSelect('attribute', 'a', 'a.id=ita.text_attribute_id')
+      .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
+      .select('a.id', 'id')
+      .addSelect('a.name', 'name')
+      .addSelect('a.external_id', 'externalId')
+      .addSelect('ta.min_length', 'text_attribute.minLength')
+      .addSelect('ta.max_length', 'text_attribute.maxLength')
+      .addSelect('ita.value', 'item_text_attribute.value')
+      .addSelect('ita.id', 'item_text_attribute.id')
+      .addSelect('ita.item_id', 'itemId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ita.item_id IN (:...itemIds)', {itemIds})
+      .execute();
+
+    return this.groupByItemId(textAttributes, (textAttribute) => ({
+      id: textAttribute['item_text_attribute.id'],
+      value: textAttribute['item_text_attribute.value'],
+      attribute: this.attributeService.mapAttribute(textAttribute),
+    }));
+  }
+
+  public async ListNumberAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const numberAttributes = await this.itemNumberAttributeRepository.createQueryBuilder('ina')
+      .leftJoinAndSelect('attribute', 'a', 'a.id=ina.number_attribute_id')
+      .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
+      .select('a.id', 'id')
+      .addSelect('a.name', 'name')
+      .addSelect('a.external_id', 'externalId')
+      .addSelect('na.min_value', 'number_attribute.minValue')
+      .addSelect('na.max_value', 'number_attribute.maxValue')
+      .addSelect('na.decimals', 'number_attribute.decimals')
+      .addSelect('ina.value', 'item_number_attribute.value')
+      .addSelect('ina.id', 'item_number_attribute.id')
+      .addSelect('ina.item_id', 'itemId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ina.item_id IN (:...itemIds)', {itemIds})
+      .execute();
+
+    return this.groupByItemId(numberAttributes, (numberAttribute) => ({
+      id: numberAttribute['item_number_attribute.id'],
+      value: numberAttribute['item_number_attribute.value'],
+      attribute: this.attributeService.mapAttribute(numberAttribute),
+    }));
+  }
+
+  public async ListBooleanAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const booleanAttributes = await this.itemBooleanAttributeRepository.createQueryBuilder('iba')
+      .leftJoinAndSelect('attribute', 'a', 'a.id=iba.boolean_attribute_id')
+      .leftJoinAndSelect('boolean_attribute', 'ba', 'ba.id=a.id')
+      .select('a.id', 'id')
+      .addSelect('a.name', 'name')
+      .addSelect('a.external_id', 'externalId')
+      .addSelect('iba.value', 'item_boolean_attribute.value')
+      .addSelect('iba.id', 'item_boolean_attribute.id')
+      .addSelect('iba.item_id', 'itemId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('iba.item_id IN (:...itemIds)', {itemIds})
+      .execute();
+
+    return this.groupByItemId(booleanAttributes, (booleanAttribute) => ({
+      id: booleanAttribute['item_boolean_attribute.id'],
+      value: booleanAttribute['item_boolean_attribute.value'],
+      attribute: this.attributeService.mapAttribute(booleanAttribute),
+    }));
+  }
+
+  public async ListJsonAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const jsonAttributes = await this.itemJsonAttributeRepository.createQueryBuilder('ija')
+      .leftJoinAndSelect('attribute', 'a', 'a.id=ija.json_attribute_id')
+      .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
+      .select('a.id', 'id')
+      .addSelect('a.name', 'name')
+      .addSelect('a.external_id', 'externalId')
+      .addSelect('ja.schema', 'json_attribute.schema')
+      .addSelect('ija.value', 'item_json_attribute.value')
+      .addSelect('ija.id', 'item_json_attribute.id')
+      .addSelect('ija.item_id', 'itemId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ija.item_id IN (:...itemIds)', {itemIds})
+      .execute();
+
+    return this.groupByItemId(jsonAttributes, (jsonAttribute) => ({
+      id: jsonAttribute['item_json_attribute.id'],
+      value: jsonAttribute['item_json_attribute.value'],
+      attribute: this.attributeService.mapAttribute(jsonAttribute),
+    }));
+  }
+
+  public async ListListAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; attributeId: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const listAttributes = await this.itemListAttributeRepository.createQueryBuilder('ila')
+      .leftJoinAndMapOne('ila.attribute', Attribute, 'a', 'a.id=ila.list_attribute_id')
+      .leftJoinAndMapOne('ila.list_attribute', ListAttribute, 'la', 'la.id=a.id')
+      .leftJoinAndMapMany('ila.items', ItemListAttributeElement, 'itlae', 'ila.id = itlae.itemListAttributeId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ila.item_id IN (:...itemIds)', {itemIds})
+      .getMany() as Array<ItemListAttribute & {
+      items: Array<ItemListAttributeElement>;
+      attribute: Attribute;
+      listAttribute: ListAttribute;
+    }>;
+
+    return this.groupByItemId(listAttributes, (listAttribute) => ({
+      id: listAttribute.id,
+      attributeId: listAttribute.attribute.id,
+      value: listAttribute.items.map(({listAttributeElementId}) => ({id: listAttributeElementId})),
+      attribute: this.attributeService.mapAttribute(listAttribute.attribute),
+    }));
+  }
+
+  public async ListLinkAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; attributeId: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const linkAttributes = await this.itemLinkAttributeRepository.createQueryBuilder('ila')
+      .leftJoinAndMapOne('ila.attribute', Attribute, 'a', 'a.id=ila.link_attribute_id')
+      .leftJoinAndMapMany('ila.items', ItemLinkAttributeElement, 'ilae', 'ila.id = ilae.itemLinkAttributeId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('ila.item_id IN (:...itemIds)', {itemIds})
+      .getMany() as Array<ItemLinkAttribute & {
+      items: Array<ItemLinkAttributeElement>;
+      attribute: Attribute;
+    }>;
+
+    return this.groupByItemId(linkAttributes, (linkAttribute) => ({
+      id: linkAttribute.id,
+      attributeId: linkAttribute.attribute.id,
+      value: linkAttribute.items.map(({linkedItemId}) => ({id: linkedItemId})),
+      attribute: this.attributeService.mapAttribute(linkAttribute.attribute),
+    }));
+  }
+
+  public async ListImageAttributesByItemIds(catalogId: string, itemIds: Array<string>) {
+    if (!itemIds.length) {
+      return new Map<string, Array<{ id: string; attributeId: string; value: unknown; attribute: AttributeDbo }>>();
+    }
+
+    const imageAttributes = await this.itemImageAttributeRepository.createQueryBuilder('iia')
+      .leftJoinAndMapOne('iia.attribute', Attribute, 'a', 'a.id = iia.image_attribute_id')
+      .leftJoinAndMapMany('iia.items', ItemImageAttributeElement, 'iiae', 'iia.id = iiae.itemImageAttributeId')
+      .where('a.catalog_id = :catalogId', {catalogId})
+      .andWhere('iia.item_id IN (:...itemIds)', {itemIds})
+      .getMany() as Array<ItemImageAttribute & {
+      items: Array<ItemImageAttributeElement>;
+      attribute: Attribute;
+    }>;
+
+    return this.groupByItemId(imageAttributes, (imageAttribute) => ({
+      id: imageAttribute.id,
+      attributeId: imageAttribute.attribute.id,
+      value: imageAttribute.items ? imageAttribute.items.map(({imageId}) => ({imageId})) : [],
+      attribute: this.attributeService.mapAttribute(imageAttribute.attribute),
+    }));
+  }
+
+  /**
+   * Batched equivalent of ListCompleteByItemId: fetches every attribute type for a whole
+   * set of items in one query per type (7 total) instead of one query per type *per item*.
+   * Returns a Map from itemId to that item's attributes, so callers listing many items avoid
+   * the N+1 (really 7N+1) query pattern.
+   */
+  public async ListCompleteByItemIds(catalogId: string, itemIds: Array<string>): Promise<Map<string, Array<{
+    id: string;
+    value: unknown;
+    attribute: AttributeDbo
+  }>>> {
+    const result = new Map<string, Array<{ id: string; value: unknown; attribute: AttributeDbo }>>();
+
+    if (!itemIds.length) {
+      return result;
+    }
+
+    const [
+      textAttributesByItemId,
+      numberAttributesByItemId,
+      booleanAttributesByItemId,
+      jsonAttributesByItemId,
+      listAttributesByItemId,
+      linkAttributesByItemId,
+      imageAttributesByItemId,
+    ] = await Promise.all([
+      this.ListTextAttributesByItemIds(catalogId, itemIds),
+      this.ListNumberAttributesByItemIds(catalogId, itemIds),
+      this.ListBooleanAttributesByItemIds(catalogId, itemIds),
+      this.ListJsonAttributesByItemIds(catalogId, itemIds),
+      this.ListListAttributesByItemIds(catalogId, itemIds),
+      this.ListLinkAttributesByItemIds(catalogId, itemIds),
+      this.ListImageAttributesByItemIds(catalogId, itemIds),
+    ]);
+
+    for (const itemId of itemIds) {
+      result.set(itemId, [
+        ...(textAttributesByItemId.get(itemId) ?? []),
+        ...(numberAttributesByItemId.get(itemId) ?? []),
+        ...(booleanAttributesByItemId.get(itemId) ?? []),
+        ...(jsonAttributesByItemId.get(itemId) ?? []),
+        ...(listAttributesByItemId.get(itemId) ?? []),
+        ...(linkAttributesByItemId.get(itemId) ?? []),
+        ...(imageAttributesByItemId.get(itemId) ?? []),
+      ]);
+    }
+
+    return result;
+  }
+
+  private groupByItemId<TRow extends { itemId: string }, TMapped>(
+    rows: Array<TRow>,
+    map: (row: TRow) => TMapped,
+  ): Map<string, Array<TMapped>> {
+    const result = new Map<string, Array<TMapped>>();
+
+    for (const row of rows) {
+      const mapped = map(row);
+      const existing = result.get(row.itemId);
+
+      if (existing) {
+        existing.push(mapped);
+      } else {
+        result.set(row.itemId, [mapped]);
+      }
+    }
+
+    return result;
+  }
 }
