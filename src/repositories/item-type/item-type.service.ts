@@ -23,6 +23,15 @@ export class ItemTypeService {
     });
   }
 
+  public async GetByExternalId(catalogId: string, externalId: string) {
+    return this.itemTypeRepository.findOne({
+      where: {
+        catalogId,
+        externalId,
+      },
+    });
+  }
+
   async Create(catalogId: string, itemTypeDto: ItemTypeCreateDto) {
     const createdItemType = this.itemTypeRepository.create({
       ...itemTypeDto,

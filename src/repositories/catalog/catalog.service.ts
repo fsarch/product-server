@@ -30,4 +30,10 @@ export class CatalogService {
   async list() {
     return await this.catalogRepository.find();
   }
+
+  async get(id: string) {
+    return await this.catalogRepository.findOne({
+      where: { id },
+    });
+  }
 }

@@ -5,6 +5,7 @@ import { ItemCreateDto, ItemDto } from "../../../models/item.model.js";
 import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 import { AttributeItemTypeService } from "../../../repositories/attribute-item-type/attribute-item-type.service.js";
 import { ItemAttributeService } from "../../../repositories/item-attribute/item-attribute.service.js";
+import { ItemTypeService } from "../../../repositories/item-type/item-type.service.js";
 
 @ApiTags('items')
 @Controller({
@@ -18,6 +19,7 @@ export class ItemsController {
     private readonly attributeService: AttributeService,
     private readonly attributeItemTypeService: AttributeItemTypeService,
     private readonly itemAttributeService: ItemAttributeService,
+    private readonly itemTypeService: ItemTypeService,
   ) {
   }
 
@@ -32,6 +34,11 @@ export class ItemsController {
     isArray: true,
   })
   @ApiQuery({
+    name: 'itemTypeExternalId',
+    required: false,
+    isArray: true,
+  })
+  @ApiQuery({
     name: 'filter',
     required: false,
     isArray: true,
@@ -40,13 +47,20 @@ export class ItemsController {
     @Param('catalogId') catalogId: string,
     @Query('parentItemId') parentItemId?: string,
     @Query('itemTypeId', new ParseArrayPipe({ items: String, optional: true })) itemTypeIds?: Array<string>,
+    @Query('itemTypeExternalId', new ParseArrayPipe({ items: String, optional: true })) itemTypeExternalIds?: Array<string>,
     @Query('filter', new ParseArrayPipe({ items: String, optional: true })) filters?: Array<string>,
   ) {
+    const resolvedItemTypeIds = itemTypeExternalIds?.length
+      ? (await Promise.all(
+          itemTypeExternalIds.map((externalId) => this.itemTypeService.GetByExternalId(catalogId, externalId)),
+        )).filter(Boolean).map((itemType) => itemType.id)
+      : [];
+
     const items = await this.itemService.List(
       catalogId,
       parentItemId === 'null' ? null : parentItemId,
       {
-        itemTypeIds,
+        itemTypeIds: [...(itemTypeIds ?? []), ...resolvedItemTypeIds],
       }
     );
 

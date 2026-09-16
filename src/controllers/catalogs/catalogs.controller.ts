@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { CatalogCreateDto, CatalogDto } from "../../models/catalog.model.js";
 import { CatalogService } from "../../repositories/catalog/catalog.service.js";
@@ -70,5 +70,18 @@ export class CatalogsController {
     const catalogs = await this.catalogService.list();
 
     return catalogs.map(CatalogDto.FromDbo);
+  }
+
+  @Get(':catalogId')
+  public async Get(
+    @Param('catalogId') catalogId: string,
+  ) {
+    const catalog = await this.catalogService.get(catalogId);
+
+    if (!catalog) {
+      throw new NotFoundException();
+    }
+
+    return CatalogDto.FromDbo(catalog);
   }
 }
