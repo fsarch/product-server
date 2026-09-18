@@ -14,6 +14,7 @@ async function bootstrap() {
       path: 'docs',
     })
     .enableAuth()
+    .enableMcp()
     .setDatabase(DATABASE_OPTIONS)
     .addCustomResource({
       id: 'catalog',
