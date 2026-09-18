@@ -3,7 +3,10 @@ uac:
   users:
     - user_id: 'abcdef'
       permissions:
-        - manage_claims
+        - read_catalog
+        - read_item_type
+        - read_attribute
+        - read_item
 
 auth:
   type: 'jwt-jwk'

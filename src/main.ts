@@ -1,6 +1,7 @@
 import { AppModule } from './app.module.js';
 import { FsArchAppBuilder } from '@fsarch/server';
 import { DATABASE_OPTIONS } from './database/index.js';
+import { Role } from './constants/role.enum.js';
 
 async function bootstrap() {
   const app = await new FsArchAppBuilder(AppModule, {
@@ -14,6 +15,7 @@ async function bootstrap() {
       path: 'docs',
     })
     .enableAuth()
+    .enableUac(Object.values(Role))
     .enableMcp()
     .setDatabase(DATABASE_OPTIONS)
     .addCustomResource({

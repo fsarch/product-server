@@ -1,4 +1,7 @@
+import { UseGuards } from '@nestjs/common';
 import { McpController, Tool } from '@fsarch/server/mcp';
+import { AuthGuard } from '@fsarch/server/auth';
+import { Roles, RolesGuard } from '@fsarch/server/uac';
 import { z } from 'zod';
 import { CatalogService } from '../../repositories/catalog/catalog.service.js';
 import { ItemTypeService } from '../../repositories/item-type/item-type.service.js';
@@ -9,6 +12,7 @@ import { CatalogDto } from '../../models/catalog.model.js';
 import { ItemTypeDto } from '../../models/item-type.model.js';
 import { ItemDto } from '../../models/item.model.js';
 import { attributeDboToAttributeDto } from '../../models/attribute.model.js';
+import { Role } from '../../constants/role.enum.js';
 
 function jsonResult(value: unknown) {
   return {
@@ -17,6 +21,7 @@ function jsonResult(value: unknown) {
 }
 
 @McpController()
+@UseGuards(AuthGuard, RolesGuard)
 export class McpToolsController {
   constructor(
     private readonly catalogService: CatalogService,
@@ -31,6 +36,7 @@ export class McpToolsController {
     description: 'List all product catalogs managed by this service.',
     parameters: z.object({}),
   })
+  @Roles(Role.read_catalog)
   async listCatalogs() {
     const catalogs = await this.catalogService.list();
 
@@ -44,6 +50,7 @@ export class McpToolsController {
       catalogId: z.string().describe('The catalog id'),
     }),
   })
+  @Roles(Role.read_catalog)
   async getCatalog({ catalogId }: { catalogId: string }) {
     const catalog = await this.catalogService.get(catalogId);
 
@@ -61,6 +68,7 @@ export class McpToolsController {
       catalogId: z.string().describe('The catalog id'),
     }),
   })
+  @Roles(Role.read_item_type)
   async listItemTypes({ catalogId }: { catalogId: string }) {
     const itemTypes = await this.itemTypeService.List(catalogId);
 
@@ -74,6 +82,7 @@ export class McpToolsController {
       catalogId: z.string().describe('The catalog id'),
     }),
   })
+  @Roles(Role.read_attribute)
   async listAttributes({ catalogId }: { catalogId: string }) {
     const attributes = await this.attributeService.list(catalogId);
 
@@ -100,6 +109,7 @@ export class McpToolsController {
         .describe('Only list items of this item type external id, e.g. "$system.product" or "$system.group"'),
     }),
   })
+  @Roles(Role.read_item)
   async listItems({
     catalogId,
     parentItemId,
@@ -149,6 +159,7 @@ export class McpToolsController {
       itemId: z.string().describe('The item id'),
     }),
   })
+  @Roles(Role.read_item)
   async getItem({ catalogId, itemId }: { catalogId: string; itemId: string }) {
     const item = await this.itemService.Get(itemId);
 
