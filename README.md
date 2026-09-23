@@ -35,7 +35,7 @@ cd product-server
 
 2. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 3. Create a configuration file:
@@ -49,14 +49,14 @@ cp config/config.template.yml config/config.yml
 
 ```bash
 # Development mode (with hot-reload)
-npm run start:dev
+pnpm run start:dev
 
 # Production mode
-npm run build
-npm run start:prod
+pnpm run build
+pnpm run start:prod
 
 # Debug mode
-npm run start:debug
+pnpm run start:debug
 ```
 
 The server will:
@@ -94,9 +94,11 @@ uac:
     - user_id: 'user-unique-id'
       permissions:
         - manage_claims
-        - read_catalogs
+        - read_catalog
         # Add other permissions as needed
 ```
+
+See [Roles](#roles) below for the full list of available permissions.
 
 ### Environment Variables
 
@@ -130,6 +132,28 @@ uac:
       permissions:
         - manage_claims
 ```
+
+## Roles
+
+Product Server uses role-based access control (UAC). A user is granted access by listing one or more of the following role names under `uac.users[].permissions` in `config/config.yml` (see [Configuration](#configuration)).
+
+| Role | Grants |
+|------|--------|
+| `manage_claims` | Framework-level role (provided by `@fsarch/server`) for managing user/claim assignments. Not specific to this service. |
+| `read_catalog` | Read access to catalogs (e.g. list/get catalogs). |
+| `read_item_type` | Read access to item types defined within a catalog. |
+| `read_attribute` | Read access to attribute definitions defined within a catalog. |
+| `read_item` | Read access to items (products/groups) and their attribute values. |
+
+These roles currently gate the [MCP](https://modelcontextprotocol.io/) tool endpoints (`src/controllers/mcp/mcp-tools.controller.ts`) — `list_catalogs`/`get_catalog` require `read_catalog`, `list_item_types` requires `read_item_type`, `list_attributes` requires `read_attribute`, and `list_items`/`get_item` require `read_item`.
+
+Roles are defined in [`src/constants/role.enum.ts`](src/constants/role.enum.ts) and follow this naming convention (matching other fsarch services):
+
+- `read_<resource>` — reading `<resource>`
+- `write_<resource>` — creating/updating `<resource>`
+- `delete_<resource>` — deleting `<resource>`
+
+The main REST API (`/v1/...`) currently only requires a valid authenticated user (see [Authorization](#authorization)) and does not yet enforce per-role checks beyond authentication.
 
 ## Databases
 
@@ -229,16 +253,16 @@ For development purposes, the following commands are available:
 
 ```bash
 # Generate a new migration based on entity changes
-npm run migration:generate -- ./src/database/migrations/YourMigrationName
+pnpm run migration:generate -- ./src/database/migrations/YourMigrationName
 
 # Create an empty migration file
-npm run migration:create -- MigrationName
+pnpm run migration:create -- MigrationName
 
 # Manually run pending migrations (optional - runs automatically on startup)
-npm run migration:run
+pnpm run migration:run
 
 # Revert the last migration
-npm run migration:revert
+pnpm run migration:revert
 ```
 
 ## Authorization
@@ -333,16 +357,16 @@ For detailed development information, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Run in development mode with hot-reload
-npm run start:dev
+pnpm run start:dev
 
 # Run tests
-npm run test
+pnpm run test
 
 # Run linter
-npm run lint
+pnpm run lint
 ```
 
 ### Key Development Resources
@@ -462,7 +486,7 @@ We welcome contributions! Please follow these guidelines:
 ### Code Standards
 
 - Follow the existing code style
-- Run `npm run lint` before committing
+- Run `pnpm run lint` before committing
 - Write tests for new features
 - Update documentation as needed
 

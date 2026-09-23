@@ -1,12 +1,12 @@
+import * as crypto from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import { Repository } from "typeorm";
-import { AttributeItemType } from "../../database/entities/attribute_item_type.entity.js";
-import { InjectRepository } from "@nestjs/typeorm";
-import { AttributeItemTypeCreateDto } from "../../models/attribute-item-type.model.js";
-import * as crypto from "node:crypto";
-import { CompleteAttribute } from "../../database/entities/attribute.entity.js";
-import { TextAttribute } from "../../database/entities/text_attribute.entity.js";
-import { ImageAttribute } from "../../database/entities/image_attribute.entity.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CompleteAttribute } from '../../database/entities/attribute.entity.js';
+import { AttributeItemType } from '../../database/entities/attribute_item_type.entity.js';
+import { ImageAttribute } from '../../database/entities/image_attribute.entity.js';
+import { TextAttribute } from '../../database/entities/text_attribute.entity.js';
+import { AttributeItemTypeCreateDto } from '../../models/attribute-item-type.model.js';
 
 type TListOptions = {
   embedAttribute?: boolean;
@@ -17,11 +17,11 @@ export class AttributeItemTypeService {
   constructor(
     @InjectRepository(AttributeItemType)
     private readonly attributeItemTypeRepository: Repository<AttributeItemType>,
-  ) {
-  }
+  ) {}
 
   public async ListByItemTypeId(itemTypeId: string, options: TListOptions) {
-    return this.attributeItemTypeRepository.createQueryBuilder('ait')
+    return this.attributeItemTypeRepository
+      .createQueryBuilder('ait')
       .where({
         itemTypeId,
       })
@@ -53,7 +53,10 @@ export class AttributeItemTypeService {
       },
     });
   }
-  public async GetByItemTypeAndAttributeId(itemTypeId: string, attributeId: string) {
+  public async GetByItemTypeAndAttributeId(
+    itemTypeId: string,
+    attributeId: string,
+  ) {
     const itemTypeAttributes = await this.attributeItemTypeRepository.find({
       where: {
         itemTypeId,
@@ -64,7 +67,11 @@ export class AttributeItemTypeService {
     return itemTypeAttributes[0];
   }
 
-  public async Create(itemTypeId: string, attributeId: string, createDto: AttributeItemTypeCreateDto): Promise<AttributeItemType> {
+  public async Create(
+    itemTypeId: string,
+    attributeId: string,
+    createDto: AttributeItemTypeCreateDto,
+  ): Promise<AttributeItemType> {
     const createdAttributeItemType = this.attributeItemTypeRepository.create({
       id: crypto.randomUUID(),
       itemTypeId,
@@ -72,7 +79,9 @@ export class AttributeItemTypeService {
       isRequired: createDto.isRequired ?? false,
     });
 
-    const savedAttributeItemType = await this.attributeItemTypeRepository.save(createdAttributeItemType);
+    const savedAttributeItemType = await this.attributeItemTypeRepository.save(
+      createdAttributeItemType,
+    );
 
     return savedAttributeItemType;
   }

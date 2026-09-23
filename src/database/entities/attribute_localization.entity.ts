@@ -30,7 +30,7 @@ export class AttributeLocalization {
   @Column({
     name: 'name',
     type: 'varchar',
-    length: 2048
+    length: 2048,
   })
   name: string;
 

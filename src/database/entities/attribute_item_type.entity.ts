@@ -5,7 +5,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Attribute } from "./attribute.entity.js";
+import { Attribute } from './attribute.entity.js';
 
 @Entity({
   name: 'attribute_item_type',

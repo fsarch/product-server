@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LocalizationsController } from './localizations.controller.js';
 import { LocalizationService } from '../../repositories/localization/localization.service.js';
+import { LocalizationsController } from './localizations.controller.js';
 
 describe('LocalizationsController', () => {
   let controller: LocalizationsController;

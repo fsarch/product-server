@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
+import { LocalizationModule } from '../../repositories/localization/localization.module.js';
 import { LocalizationsController } from './localizations.controller.js';
-import { LocalizationModule } from "../../repositories/localization/localization.module.js";
 
 @Module({
   controllers: [LocalizationsController],

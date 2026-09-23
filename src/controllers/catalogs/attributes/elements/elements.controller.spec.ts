@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ElementsController } from './elements.controller.js';
 import { AttributeService } from '../../../../repositories/attribute/attribute.service.js';
 import { AttributeLocalizationService } from '../../../../repositories/attribute-localization/attribute-localization.service.js';
+import { ElementsController } from './elements.controller.js';
 
 describe('ElementsController', () => {
   let controller: ElementsController;

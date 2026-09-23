@@ -1,18 +1,18 @@
-import { UseGuards } from '@nestjs/common';
-import { McpController, Tool } from '@fsarch/server/mcp';
 import { AuthGuard } from '@fsarch/server/auth';
+import { McpController, Tool } from '@fsarch/server/mcp';
 import { Roles, RolesGuard } from '@fsarch/server/uac';
+import { UseGuards } from '@nestjs/common';
 import { z } from 'zod';
+import { Role } from '../../constants/role.enum.js';
+import { attributeDboToAttributeDto } from '../../models/attribute.model.js';
+import { CatalogDto } from '../../models/catalog.model.js';
+import { ItemDto } from '../../models/item.model.js';
+import { ItemTypeDto } from '../../models/item-type.model.js';
+import { AttributeService } from '../../repositories/attribute/attribute.service.js';
 import { CatalogService } from '../../repositories/catalog/catalog.service.js';
-import { ItemTypeService } from '../../repositories/item-type/item-type.service.js';
 import { ItemService } from '../../repositories/item/item.service.js';
 import { ItemAttributeService } from '../../repositories/item-attribute/item-attribute.service.js';
-import { AttributeService } from '../../repositories/attribute/attribute.service.js';
-import { CatalogDto } from '../../models/catalog.model.js';
-import { ItemTypeDto } from '../../models/item-type.model.js';
-import { ItemDto } from '../../models/item.model.js';
-import { attributeDboToAttributeDto } from '../../models/attribute.model.js';
-import { Role } from '../../constants/role.enum.js';
+import { ItemTypeService } from '../../repositories/item-type/item-type.service.js';
 
 function jsonResult(value: unknown) {
   return {
@@ -63,7 +63,8 @@ export class McpToolsController {
 
   @Tool({
     name: 'list_item_types',
-    description: 'List the item types (e.g. product, group) defined in a catalog.',
+    description:
+      'List the item types (e.g. product, group) defined in a catalog.',
     parameters: z.object({
       catalogId: z.string().describe('The catalog id'),
     }),
@@ -77,7 +78,8 @@ export class McpToolsController {
 
   @Tool({
     name: 'list_attributes',
-    description: 'List the attribute definitions (name, type, external id) available in a catalog.',
+    description:
+      'List the attribute definitions (name, type, external id) available in a catalog.',
     parameters: z.object({
       catalogId: z.string().describe('The catalog id'),
     }),
@@ -106,7 +108,9 @@ export class McpToolsController {
       itemTypeExternalId: z
         .string()
         .optional()
-        .describe('Only list items of this item type external id, e.g. "$system.product" or "$system.group"'),
+        .describe(
+          'Only list items of this item type external id, e.g. "$system.product" or "$system.group"',
+        ),
     }),
   })
   @Roles(Role.read_item)
@@ -123,9 +127,14 @@ export class McpToolsController {
   }) {
     let itemTypeIds: Array<string> = [];
     if (itemTypeExternalId) {
-      const itemType = await this.itemTypeService.GetByExternalId(catalogId, itemTypeExternalId);
+      const itemType = await this.itemTypeService.GetByExternalId(
+        catalogId,
+        itemTypeExternalId,
+      );
       if (!itemType) {
-        return jsonResult({ error: `Item type ${itemTypeExternalId} not found in catalog ${catalogId}` });
+        return jsonResult({
+          error: `Item type ${itemTypeExternalId} not found in catalog ${catalogId}`,
+        });
       }
       itemTypeIds = [itemType.id];
     }
@@ -136,10 +145,11 @@ export class McpToolsController {
       { itemTypeIds },
     );
 
-    const attributesByItemId = await this.itemAttributeService.ListCompleteByItemIds(
-      catalogId,
-      items.map((item) => item.id),
-    );
+    const attributesByItemId =
+      await this.itemAttributeService.ListCompleteByItemIds(
+        catalogId,
+        items.map((item) => item.id),
+      );
 
     const mappedItems = items.map((item) =>
       ItemDto.FromDbo({
@@ -153,7 +163,8 @@ export class McpToolsController {
 
   @Tool({
     name: 'get_item',
-    description: 'Get a single item (product/group) by id, including its attribute values.',
+    description:
+      'Get a single item (product/group) by id, including its attribute values.',
     parameters: z.object({
       catalogId: z.string().describe('The catalog id'),
       itemId: z.string().describe('The item id'),
@@ -167,7 +178,10 @@ export class McpToolsController {
       return jsonResult({ error: `Item ${itemId} not found` });
     }
 
-    const attributes = await this.itemAttributeService.ListCompleteByItemId(catalogId, item.id);
+    const attributes = await this.itemAttributeService.ListCompleteByItemId(
+      catalogId,
+      item.id,
+    );
 
     return jsonResult(ItemDto.FromDbo({ ...item, attributes }));
   }

@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
-import { Item } from "../../database/entities/item.entity.js";
-import { ItemAttributeDto, ItemCreateDto } from "../../models/item.model.js";
-import { AttributeDto } from "../../models/attribute.model.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import { Item } from '../../database/entities/item.entity.js';
+import { AttributeDto } from '../../models/attribute.model.js';
+import { ItemAttributeDto, ItemCreateDto } from '../../models/item.model.js';
 
 @Injectable()
 export class ItemService {
   constructor(
     @InjectRepository(Item)
     private readonly itemRepository: Repository<Item>,
-  ) {
-  }
+  ) {}
 
   public async List(
     catalogId: string,
@@ -19,40 +18,47 @@ export class ItemService {
     options?: {
       itemTypeIds?: Array<string>;
     },
-  ): Promise<Array<Item & { attributes: Array<ItemAttributeDto<AttributeDto>> }>> {
-    let itemQueryBuilder = this.itemRepository.createQueryBuilder('i')
+  ): Promise<
+    Array<Item & { attributes: Array<ItemAttributeDto<AttributeDto>> }>
+  > {
+    let itemQueryBuilder = this.itemRepository
+      .createQueryBuilder('i')
       .select('i.id', 'id')
       .addSelect('i.item_type_id', 'itemTypeId')
       .where('i.catalog_id = :catalogId', { catalogId });
 
     if (parentItemId) {
-      itemQueryBuilder = itemQueryBuilder
-        .andWhere('parent_item_id = :parentItemId', { parentItemId })
+      itemQueryBuilder = itemQueryBuilder.andWhere(
+        'parent_item_id = :parentItemId',
+        { parentItemId },
+      );
     }
     if (parentItemId === null) {
-      itemQueryBuilder = itemQueryBuilder
-        .andWhere('parent_item_id IS NULL')
+      itemQueryBuilder = itemQueryBuilder.andWhere('parent_item_id IS NULL');
     }
 
     console.log('options?.itemTypeIds', options?.itemTypeIds);
     if (options?.itemTypeIds?.length) {
-      itemQueryBuilder = itemQueryBuilder
-        .andWhere('i.item_type_id IN (:...itemTypeIds)', { itemTypeIds: options.itemTypeIds });
+      itemQueryBuilder = itemQueryBuilder.andWhere(
+        'i.item_type_id IN (:...itemTypeIds)',
+        { itemTypeIds: options.itemTypeIds },
+      );
     }
 
-    return itemQueryBuilder
-      .execute();
+    return itemQueryBuilder.execute();
   }
 
-  public async ListRecursiveFlat(
-    catalogId: string,
-    parentItemId?: string,
-  ) {
-    const items = await this.List(catalogId, parentItemId === 'null' ? null : parentItemId);
+  public async ListRecursiveFlat(catalogId: string, parentItemId?: string) {
+    const items = await this.List(
+      catalogId,
+      parentItemId === 'null' ? null : parentItemId,
+    );
 
-    const mappedItems = await Promise.all(items.map(async (item) => {
-      return [item, ...await this.ListRecursiveFlat(catalogId, item.id)];
-    }));
+    const mappedItems = await Promise.all(
+      items.map(async (item) => {
+        return [item, ...(await this.ListRecursiveFlat(catalogId, item.id))];
+      }),
+    );
 
     return mappedItems.flat();
   }
@@ -65,7 +71,10 @@ export class ItemService {
     });
   }
 
-  public async Create(catalogId: string, itemTypeDto: ItemCreateDto): Promise<Item> {
+  public async Create(
+    catalogId: string,
+    itemTypeDto: ItemCreateDto,
+  ): Promise<Item> {
     const createdItem = this.itemRepository.create({
       id: crypto.randomUUID(),
       catalogId,

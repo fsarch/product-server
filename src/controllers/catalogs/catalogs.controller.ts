@@ -1,11 +1,18 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { CatalogCreateDto, CatalogDto } from "../../models/catalog.model.js";
-import { CatalogService } from "../../repositories/catalog/catalog.service.js";
-import { ItemTypeService } from "../../repositories/item-type/item-type.service.js";
-import { AttributeService } from "../../repositories/attribute/attribute.service.js";
-import { AttributeType } from "../../constants/attribute-type.enum.js";
-import { AttributeItemTypeService } from "../../repositories/attribute-item-type/attribute-item-type.service.js";
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AttributeType } from '../../constants/attribute-type.enum.js';
+import { CatalogCreateDto, CatalogDto } from '../../models/catalog.model.js';
+import { AttributeService } from '../../repositories/attribute/attribute.service.js';
+import { AttributeItemTypeService } from '../../repositories/attribute-item-type/attribute-item-type.service.js';
+import { CatalogService } from '../../repositories/catalog/catalog.service.js';
+import { ItemTypeService } from '../../repositories/item-type/item-type.service.js';
 
 @ApiTags('catalog')
 @Controller({
@@ -22,12 +29,10 @@ export class CatalogsController {
   ) {}
 
   @Post()
-  public async Post(
-    @Body() catalogCreateDto: CatalogCreateDto,
-  ) {
+  public async Post(@Body() catalogCreateDto: CatalogCreateDto) {
     const createdCatalog = await this.catalogService.create(catalogCreateDto);
 
-    ((async () => {
+    (async () => {
       const attribute = await this.attributeService.create(createdCatalog.id, {
         name: 'Name',
         attributeTypeId: AttributeType.TEXT,
@@ -36,29 +41,43 @@ export class CatalogsController {
 
       await Promise.all([
         (async () => {
-          const productItemType = await this.itemTypeService.Create(createdCatalog.id, {
-            name: 'Produkt',
-            externalId: '$system.product',
-          });
+          const productItemType = await this.itemTypeService.Create(
+            createdCatalog.id,
+            {
+              name: 'Produkt',
+              externalId: '$system.product',
+            },
+          );
 
-          await this.attributeItemTypeService.Create(productItemType.id, attribute.id, {
-            attributeId: attribute.id,
-            isRequired: true,
-          });
+          await this.attributeItemTypeService.Create(
+            productItemType.id,
+            attribute.id,
+            {
+              attributeId: attribute.id,
+              isRequired: true,
+            },
+          );
         })(),
         (async () => {
-          const groupItemType = await this.itemTypeService.Create(createdCatalog.id, {
-            name: 'Gruppe',
-            externalId: '$system.group',
-          });
+          const groupItemType = await this.itemTypeService.Create(
+            createdCatalog.id,
+            {
+              name: 'Gruppe',
+              externalId: '$system.group',
+            },
+          );
 
-          await this.attributeItemTypeService.Create(groupItemType.id, attribute.id, {
-            attributeId: attribute.id,
-            isRequired: true,
-          });
+          await this.attributeItemTypeService.Create(
+            groupItemType.id,
+            attribute.id,
+            {
+              attributeId: attribute.id,
+              isRequired: true,
+            },
+          );
         })(),
       ]);
-    })()).catch((err) => console.error(err));
+    })().catch((err) => console.error(err));
 
     return {
       id: createdCatalog.id,
@@ -73,9 +92,7 @@ export class CatalogsController {
   }
 
   @Get(':catalogId')
-  public async Get(
-    @Param('catalogId') catalogId: string,
-  ) {
+  public async Get(@Param('catalogId') catalogId: string) {
     const catalog = await this.catalogService.get(catalogId);
 
     if (!catalog) {

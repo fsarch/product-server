@@ -50,8 +50,8 @@ product-server/
 
 ### Prerequisites
 
-- Node.js v20.x or higher
-- npm v9.x or higher
+- Node.js v24.x or higher
+- pnpm (via Corepack, bundled with Node.js - run `corepack enable`)
 - Docker (for PostgreSQL and Keycloak)
 - Git
 
@@ -65,7 +65,7 @@ product-server/
 
 2. **Install dependencies**:
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Set up configuration**:
@@ -91,7 +91,7 @@ product-server/
 
 6. **Start the application**:
    ```bash
-   npm run start:dev
+   pnpm run start:dev
    ```
 
 The application will start on port 3000 and automatically apply database migrations.
@@ -102,37 +102,34 @@ The application will start on port 3000 and automatically apply database migrati
 
 ```bash
 # Development mode with hot-reload
-npm run start:dev
+pnpm run start:dev
 
 # Production build and run
-npm run build
-npm run start:prod
+pnpm run build
+pnpm run start:prod
 
 # Debug mode
-npm run start:debug
+pnpm run start:debug
 ```
 
 ### Building
 
 ```bash
 # Build TypeScript to JavaScript
-npm run build
+pnpm run build
 
 # Watch mode (rebuilds on file changes)
-npm run build -- --watch
+pnpm run build -- --watch
 ```
 
 ### Code Quality
 
 ```bash
-# Run ESLint
-npm run lint
+# Run Biome (checks and auto-fixes lint issues)
+pnpm run lint
 
-# Fix ESLint issues automatically
-npm run lint -- --fix
-
-# Format code with Prettier
-npm run format
+# Format code with Biome
+pnpm run format
 ```
 
 ## Database Migrations
@@ -145,7 +142,7 @@ When you modify entity definitions, generate a migration:
 
 ```bash
 # Generate migration based on entity changes
-npm run migration:generate -- ./src/database/migrations/YourMigrationName
+pnpm run migration:generate -- ./src/database/migrations/YourMigrationName
 ```
 
 This compares your entity definitions with the current database schema and creates a migration file.
@@ -154,16 +151,16 @@ This compares your entity definitions with the current database schema and creat
 
 ```bash
 # Generate migration (detects changes automatically)
-npm run migration:generate -- ./src/database/migrations/MigrationName
+pnpm run migration:generate -- ./src/database/migrations/MigrationName
 
 # Create empty migration file (for manual SQL)
-npm run migration:create -- MigrationName
+pnpm run migration:create -- MigrationName
 
 # Run pending migrations manually (usually automatic)
-npm run migration:run
+pnpm run migration:run
 
 # Revert the last migration
-npm run migration:revert
+pnpm run migration:revert
 ```
 
 ### Migration Best Practices
@@ -202,19 +199,19 @@ After creating or modifying entities:
 
 ```bash
 # Run all unit tests
-npm run test
+pnpm run test
 
 # Run tests in watch mode (runs on file changes)
-npm run test:watch
+pnpm run test:watch
 
 # Run tests with coverage report
-npm run test:cov
+pnpm run test:cov
 
 # Run end-to-end tests
-npm run test:e2e
+pnpm run test:e2e
 
 # Run specific test file
-npm run test -- path/to/test.spec.ts
+pnpm run test -- path/to/test.spec.ts
 ```
 
 ### Test Structure
@@ -251,26 +248,23 @@ describe('MyService', () => {
 
 ### Linting
 
-The project uses ESLint with TypeScript support:
+The project uses Biome with TypeScript support:
 
 ```bash
-# Check for linting issues
-npm run lint
-
-# Auto-fix linting issues
-npm run lint -- --fix
+# Check for linting issues and auto-fix them
+pnpm run lint
 ```
 
 ### Formatting
 
-Code formatting is handled by Prettier:
+Code formatting is also handled by Biome:
 
 ```bash
 # Format all files
-npm run format
+pnpm run format
 ```
 
-Configuration is in `.prettierrc` and `.eslintrc.js`.
+Configuration is in `biome.json`.
 
 ### Pre-commit Hooks
 
@@ -278,8 +272,8 @@ Consider setting up pre-commit hooks to automatically run linting and formatting
 
 ```bash
 # Install husky (not included by default)
-npm install --save-dev husky lint-staged
-npx husky install
+pnpm add --save-dev husky lint-staged
+pnpm exec husky install
 ```
 
 ## API Development
@@ -400,7 +394,7 @@ export class MyRepository {
 Start the application in debug mode:
 
 ```bash
-npm run start:debug
+pnpm run start:debug
 ```
 
 Then attach a debugger (VS Code configuration):
@@ -445,7 +439,7 @@ Create environment-specific configuration files:
 Load configuration based on NODE_ENV:
 
 ```bash
-NODE_ENV=production npm run start:prod
+NODE_ENV=production pnpm run start:prod
 ```
 
 ## Contributing
@@ -465,8 +459,8 @@ NODE_ENV=production npm run start:prod
 
 3. **Run tests and linting**:
    ```bash
-   npm run lint
-   npm run test
+   pnpm run lint
+   pnpm run test
    ```
 
 4. **Push and create pull request**:
@@ -484,9 +478,9 @@ NODE_ENV=production npm run start:prod
 
 ### Pull Request Checklist
 
-- [ ] Tests pass (`npm run test`)
-- [ ] Linting passes (`npm run lint`)
-- [ ] Code is formatted (`npm run format`)
+- [ ] Tests pass (`pnpm run test`)
+- [ ] Linting passes (`pnpm run lint`)
+- [ ] Code is formatted (`pnpm run format`)
 - [ ] Documentation updated
 - [ ] Migrations created if needed
 - [ ] API documentation (Swagger) updated
@@ -512,14 +506,14 @@ kill -9 <PID>
 ```bash
 # Clean build artifacts
 rm -rf dist
-npm run build
+pnpm run build
 ```
 
 **Module not found**:
 ```bash
 # Reinstall dependencies
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 ```
 
 ## Additional Resources

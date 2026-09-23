@@ -1,29 +1,32 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Item } from "../database/entities/item.entity.js";
-import { ItemListAttribute } from "../database/entities/item_list_attribute.entity.js";
-import { ItemTextAttribute } from "../database/entities/item_text_attribute.entity.js";
-import { ItemNumberAttribute } from "../database/entities/item_number_attribute.entity.js";
-import { ItemBooleanAttribute } from "../database/entities/item_boolean_attribute.entity.js";
-import { ItemJsonAttribute } from "../database/entities/item_json_attribute.entity.js";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Item } from '../database/entities/item.entity.js';
+import { ItemBooleanAttribute } from '../database/entities/item_boolean_attribute.entity.js';
+import { ItemJsonAttribute } from '../database/entities/item_json_attribute.entity.js';
+import { ItemListAttribute } from '../database/entities/item_list_attribute.entity.js';
+import { ItemNumberAttribute } from '../database/entities/item_number_attribute.entity.js';
+import { ItemTextAttribute } from '../database/entities/item_text_attribute.entity.js';
 import {
   AttributeDto,
   BooleanAttributeDto,
   JsonAttributeDto,
   NumberAttributeDto,
-  TextAttributeDto
-} from "./attribute.model.js";
+  TextAttributeDto,
+} from './attribute.model.js';
 
 export class ItemDto {
-  public static FromDbo(item: Item & { attributes: Array<ItemAttributeDto<any>> }): ItemDto {
+  public static FromDbo(
+    item: Item & { attributes: Array<ItemAttributeDto<any>> },
+  ): ItemDto {
     const itemDto = new ItemDto();
 
     itemDto.id = item.id;
     itemDto.itemTypeId = item.itemTypeId;
     itemDto.parentItemId = item.parentItemId;
     itemDto.externalId = item.externalId;
-    itemDto.name = item.attributes?.find(
-      (a) => a.attribute.externalId === '$system.name'
-    )?.['value'] || itemDto.id;
+    itemDto.name =
+      item.attributes?.find((a) => a.attribute.externalId === '$system.name')?.[
+        'value'
+      ] || itemDto.id;
     itemDto.attributes = item.attributes;
 
     return itemDto;
@@ -55,12 +58,17 @@ export class ItemDto {
 }
 
 export class ItemAttributeDto<T extends AttributeDto> {
-  public static CopyFromDbo<U extends ItemAttributeDto<T>, T extends AttributeDto>(
-    attribute: (ItemListAttribute
+  public static CopyFromDbo<
+    U extends ItemAttributeDto<T>,
+    T extends AttributeDto,
+  >(
+    attribute: (
+      | ItemListAttribute
       | ItemTextAttribute
       | ItemNumberAttribute
       | ItemBooleanAttribute
-      | ItemJsonAttribute) & { attribute?: T },
+      | ItemJsonAttribute
+    ) & { attribute?: T },
     attributeDto: U,
   ): U {
     attributeDto.id = attribute.id;
@@ -78,7 +86,10 @@ export class ItemAttributeDto<T extends AttributeDto> {
 
 export class ItemTextAttributeDto extends ItemAttributeDto<TextAttributeDto> {
   public static FromDbo(itemAttribute: any): ItemTextAttributeDto {
-    const attributeDto = super.CopyFromDbo(itemAttribute, new ItemTextAttributeDto());
+    const attributeDto = super.CopyFromDbo(
+      itemAttribute,
+      new ItemTextAttributeDto(),
+    );
 
     attributeDto.value = itemAttribute.value;
     attributeDto.attribute = itemAttribute.attribute;
@@ -92,7 +103,10 @@ export class ItemTextAttributeDto extends ItemAttributeDto<TextAttributeDto> {
 
 export class ItemNumberAttributeDto extends ItemAttributeDto<NumberAttributeDto> {
   public static FromDbo(itemAttribute: any): ItemNumberAttributeDto {
-    const attributeDto = super.CopyFromDbo(itemAttribute, new ItemNumberAttributeDto());
+    const attributeDto = super.CopyFromDbo(
+      itemAttribute,
+      new ItemNumberAttributeDto(),
+    );
 
     attributeDto.value = itemAttribute.value;
 
@@ -105,7 +119,10 @@ export class ItemNumberAttributeDto extends ItemAttributeDto<NumberAttributeDto>
 
 export class ItemBooleanAttributeDto extends ItemAttributeDto<BooleanAttributeDto> {
   public static FromDbo(itemAttribute: any): ItemBooleanAttributeDto {
-    const attributeDto = super.CopyFromDbo(itemAttribute, new ItemBooleanAttributeDto());
+    const attributeDto = super.CopyFromDbo(
+      itemAttribute,
+      new ItemBooleanAttributeDto(),
+    );
 
     attributeDto.value = itemAttribute.value;
 
@@ -118,7 +135,10 @@ export class ItemBooleanAttributeDto extends ItemAttributeDto<BooleanAttributeDt
 
 export class ItemJsonAttributeDto extends ItemAttributeDto<JsonAttributeDto> {
   public static FromDbo(itemAttribute: any): ItemJsonAttributeDto {
-    const attributeDto = super.CopyFromDbo(itemAttribute, new ItemJsonAttributeDto());
+    const attributeDto = super.CopyFromDbo(
+      itemAttribute,
+      new ItemJsonAttributeDto(),
+    );
 
     attributeDto.value = itemAttribute.value;
 

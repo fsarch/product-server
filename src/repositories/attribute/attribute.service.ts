@@ -1,30 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Attribute } from "../../database/entities/attribute.entity.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
+import { Repository } from 'typeorm';
+import { AttributeType } from '../../constants/attribute-type.enum.js';
+import { Attribute } from '../../database/entities/attribute.entity.js';
+import { BooleanAttribute } from '../../database/entities/boolean_attribute.entity.js';
+import { ImageAttribute } from '../../database/entities/image_attribute.entity.js';
+import { JsonAttribute } from '../../database/entities/json_attribute.entity.js';
+import { LinkAttribute } from '../../database/entities/link_attribute.entity.js';
+import { ListAttribute } from '../../database/entities/list_attribute.entity.js';
+import { ListAttributeElement } from '../../database/entities/list_attribute_element.entity.js';
+import { NumberAttribute } from '../../database/entities/number_attribute.entity.js';
+import { TextAttribute } from '../../database/entities/text_attribute.entity.js';
 import {
   AttributeCreateDto,
-  BooleanAttributeCreateDto, ImageAttributeCreateDto, JsonAttributeCreateDto, LinkAttributeCreateDto,
+  BooleanAttributeCreateDto,
+  ImageAttributeCreateDto,
+  JsonAttributeCreateDto,
+  LinkAttributeCreateDto,
   ListAttributeCreateDto,
-  NumberAttributeCreateDto, TAttributeCreateDto, TextAttributeCreateDto
-} from "../../models/attribute.model.js";
-import { ListAttribute } from "../../database/entities/list_attribute.entity.js";
-import { JsonAttribute } from "../../database/entities/json_attribute.entity.js";
-import { TextAttribute } from "../../database/entities/text_attribute.entity.js";
-import { NumberAttribute } from "../../database/entities/number_attribute.entity.js";
-import { BooleanAttribute } from "../../database/entities/boolean_attribute.entity.js";
-import { LinkAttribute } from "../../database/entities/link_attribute.entity.js";
-import { ImageAttribute } from "../../database/entities/image_attribute.entity.js";
-import { AttributeType } from "../../constants/attribute-type.enum.js";
-import { plainToInstance } from "class-transformer";
-import { AttributeDbo } from "../../models/dbo/attribute.dbo.js";
-import { TextAttributeDbo } from "../../models/dbo/text-attribute.dbo.js";
-import { NumberAttributeDbo } from "../../models/dbo/number-attribute.dbo.js";
-import { JsonAttributeDbo } from "../../models/dbo/json-attribute.dbo.js";
-import { LinkAttributeDbo } from "../../models/dbo/link-attribute.dbo.js";
-import { ImageAttributeDbo } from "../../models/dbo/image-attribute.dbo.js";
-import { ListAttributeElement } from "../../database/entities/list_attribute_element.entity.js";
-import { ListAttributeElementCreateDto } from "../../models/list-attribute-element.model.js";
+  NumberAttributeCreateDto,
+  TAttributeCreateDto,
+  TextAttributeCreateDto,
+} from '../../models/attribute.model.js';
+import { AttributeDbo } from '../../models/dbo/attribute.dbo.js';
+import { ImageAttributeDbo } from '../../models/dbo/image-attribute.dbo.js';
+import { JsonAttributeDbo } from '../../models/dbo/json-attribute.dbo.js';
+import { LinkAttributeDbo } from '../../models/dbo/link-attribute.dbo.js';
+import { NumberAttributeDbo } from '../../models/dbo/number-attribute.dbo.js';
+import { TextAttributeDbo } from '../../models/dbo/text-attribute.dbo.js';
+import { ListAttributeElementCreateDto } from '../../models/list-attribute-element.model.js';
 
 @Injectable()
 export class AttributeService {
@@ -47,10 +52,12 @@ export class AttributeService {
     private readonly linkAttributeRepository: Repository<LinkAttribute>,
     @InjectRepository(ImageAttribute)
     private readonly imageAttributeRepository: Repository<ImageAttribute>,
-  ) {
-  }
+  ) {}
 
-  public async createListElement(listAttributeId: string, createDto: ListAttributeElementCreateDto) {
+  public async createListElement(
+    listAttributeId: string,
+    createDto: ListAttributeElementCreateDto,
+  ) {
     const id = crypto.randomUUID();
 
     const createdAttributeElement = this.listAttributeElementRepository.create({
@@ -60,7 +67,9 @@ export class AttributeService {
       externalId: createDto.externalId,
     });
 
-    return await this.listAttributeElementRepository.save(createdAttributeElement);
+    return await this.listAttributeElementRepository.save(
+      createdAttributeElement,
+    );
   }
 
   public async listElementsByAttributeId(listAttributeId: string) {
@@ -71,7 +80,10 @@ export class AttributeService {
     });
   }
 
-  private async createListAttribute(id: string, createDto: ListAttributeCreateDto) {
+  private async createListAttribute(
+    id: string,
+    createDto: ListAttributeCreateDto,
+  ) {
     const createdAttribute = this.listAttributeRepository.create({
       id,
     });
@@ -79,7 +91,10 @@ export class AttributeService {
     await this.listAttributeRepository.save(createdAttribute);
   }
 
-  private async createBooleanAttribute(id: string, createDto: BooleanAttributeCreateDto) {
+  private async createBooleanAttribute(
+    id: string,
+    createDto: BooleanAttributeCreateDto,
+  ) {
     const createdAttribute = this.booleanAttributeRepository.create({
       id,
     });
@@ -87,7 +102,10 @@ export class AttributeService {
     await this.booleanAttributeRepository.save(createdAttribute);
   }
 
-  private async createNumberAttribute(id: string, createDto: NumberAttributeCreateDto) {
+  private async createNumberAttribute(
+    id: string,
+    createDto: NumberAttributeCreateDto,
+  ) {
     const createdAttribute = this.numberAttributeRepository.create({
       id,
       decimals: createDto.decimals,
@@ -98,7 +116,10 @@ export class AttributeService {
     await this.numberAttributeRepository.save(createdAttribute);
   }
 
-  private async createTextAttribute(id: string, createDto: TextAttributeCreateDto) {
+  private async createTextAttribute(
+    id: string,
+    createDto: TextAttributeCreateDto,
+  ) {
     const createdAttribute = this.textAttributeRepository.create({
       id,
       minLength: createDto.minLength,
@@ -108,7 +129,10 @@ export class AttributeService {
     await this.textAttributeRepository.save(createdAttribute);
   }
 
-  private async createJsonAttribute(id: string, createDto: JsonAttributeCreateDto) {
+  private async createJsonAttribute(
+    id: string,
+    createDto: JsonAttributeCreateDto,
+  ) {
     const createdAttribute = this.jsonAttributeRepository.create({
       id,
       schema: createDto.schema,
@@ -117,7 +141,10 @@ export class AttributeService {
     await this.jsonAttributeRepository.save(createdAttribute);
   }
 
-  private async createLinkAttribute(id: string, createDto: LinkAttributeCreateDto) {
+  private async createLinkAttribute(
+    id: string,
+    createDto: LinkAttributeCreateDto,
+  ) {
     const createdAttribute = this.linkAttributeRepository.create({
       id,
       item_type_id: createDto.itemTypeId ?? null,
@@ -126,7 +153,10 @@ export class AttributeService {
     await this.linkAttributeRepository.save(createdAttribute);
   }
 
-  private async createImageAttribute(id: string, createDto: ImageAttributeCreateDto) {
+  private async createImageAttribute(
+    id: string,
+    createDto: ImageAttributeCreateDto,
+  ) {
     const createdAttribute = this.imageAttributeRepository.create({
       id,
       imageServerUrl: createDto.imageServerUrl,
@@ -135,7 +165,10 @@ export class AttributeService {
     await this.imageAttributeRepository.save(createdAttribute);
   }
 
-  public async create(catalogId: string, attributeCreateDto: TAttributeCreateDto) {
+  public async create(
+    catalogId: string,
+    attributeCreateDto: TAttributeCreateDto,
+  ) {
     const id = crypto.randomUUID();
 
     const createdAttribute = this.attributeRepository.create({
@@ -144,22 +177,38 @@ export class AttributeService {
       id,
     });
 
-    const savedAttribute = await this.attributeRepository.save(createdAttribute);
+    const savedAttribute =
+      await this.attributeRepository.save(createdAttribute);
 
     if (attributeCreateDto.attributeTypeId === AttributeType.LIST) {
       await this.createListAttribute(id, attributeCreateDto);
     } else if (attributeCreateDto.attributeTypeId === AttributeType.BOOLEAN) {
       await this.createBooleanAttribute(id, attributeCreateDto);
     } else if (attributeCreateDto.attributeTypeId === AttributeType.NUMBER) {
-      await this.createNumberAttribute(id, attributeCreateDto as NumberAttributeCreateDto);
+      await this.createNumberAttribute(
+        id,
+        attributeCreateDto as NumberAttributeCreateDto,
+      );
     } else if (attributeCreateDto.attributeTypeId === AttributeType.TEXT) {
-      await this.createTextAttribute(id, attributeCreateDto as TextAttributeCreateDto);
+      await this.createTextAttribute(
+        id,
+        attributeCreateDto as TextAttributeCreateDto,
+      );
     } else if (attributeCreateDto.attributeTypeId === AttributeType.JSON) {
-      await this.createJsonAttribute(id, attributeCreateDto as JsonAttributeCreateDto);
+      await this.createJsonAttribute(
+        id,
+        attributeCreateDto as JsonAttributeCreateDto,
+      );
     } else if (attributeCreateDto.attributeTypeId === AttributeType.LINK) {
-      await this.createLinkAttribute(id, attributeCreateDto as LinkAttributeCreateDto);
+      await this.createLinkAttribute(
+        id,
+        attributeCreateDto as LinkAttributeCreateDto,
+      );
     } else if (attributeCreateDto.attributeTypeId === AttributeType.IMAGE) {
-      await this.createImageAttribute(id, attributeCreateDto as ImageAttributeCreateDto);
+      await this.createImageAttribute(
+        id,
+        attributeCreateDto as ImageAttributeCreateDto,
+      );
     }
 
     return {
@@ -168,7 +217,8 @@ export class AttributeService {
   }
 
   public async list(catalogId: string) {
-    const list = await this.attributeRepository.createQueryBuilder('a')
+    const list = await this.attributeRepository
+      .createQueryBuilder('a')
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
       .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
@@ -195,7 +245,8 @@ export class AttributeService {
   }
 
   public async get(id: string) {
-    const item = await this.attributeRepository.createQueryBuilder('a')
+    const item = await this.attributeRepository
+      .createQueryBuilder('a')
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
       .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
@@ -224,7 +275,8 @@ export class AttributeService {
   }
 
   public async GetByExternalId(catalogId: string, externalId: string) {
-    const item = await this.attributeRepository.createQueryBuilder('a')
+    const item = await this.attributeRepository
+      .createQueryBuilder('a')
       .leftJoinAndSelect('text_attribute', 'ta', 'ta.id=a.id')
       .leftJoinAndSelect('number_attribute', 'na', 'na.id=a.id')
       .leftJoinAndSelect('json_attribute', 'ja', 'ja.id=a.id')
@@ -264,15 +316,25 @@ export class AttributeService {
     if (attribute.attributeTypeId === AttributeType.TEXT) {
       return plainToInstance(TextAttributeDbo, {
         ...baseProperties,
-        minLength: attribute['text_attribute.minLength'] ? parseInt(attribute['text_attribute.minLength'], 10) : null,
-        maxLength: attribute['text_attribute.maxLength'] ? parseInt(attribute['text_attribute.maxLength'], 10) : null,
+        minLength: attribute['text_attribute.minLength']
+          ? parseInt(attribute['text_attribute.minLength'], 10)
+          : null,
+        maxLength: attribute['text_attribute.maxLength']
+          ? parseInt(attribute['text_attribute.maxLength'], 10)
+          : null,
       });
     } else if (attribute.attributeTypeId === AttributeType.NUMBER) {
       return plainToInstance(NumberAttributeDbo, {
         ...baseProperties,
-        minValue: attribute['number_attribute.minValue'] ? parseFloat(attribute['number_attribute.minValue']) : null,
-        maxValue: attribute['number_attribute.maxValue'] ? parseFloat(attribute['number_attribute.maxValue']) : null,
-        decimals: attribute['number_attribute.decimals'] ? parseInt(attribute['number_attribute.decimals'], 10) : null,
+        minValue: attribute['number_attribute.minValue']
+          ? parseFloat(attribute['number_attribute.minValue'])
+          : null,
+        maxValue: attribute['number_attribute.maxValue']
+          ? parseFloat(attribute['number_attribute.maxValue'])
+          : null,
+        decimals: attribute['number_attribute.decimals']
+          ? parseInt(attribute['number_attribute.decimals'], 10)
+          : null,
       });
     } else if (attribute.attributeTypeId === AttributeType.JSON) {
       return plainToInstance(JsonAttributeDbo, {

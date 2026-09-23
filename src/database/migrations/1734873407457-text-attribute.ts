@@ -29,14 +29,16 @@ export class TextAttribute1734873407457 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__number_attribute__id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__number_attribute__id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+        ],
       }),
     );
     // endregion
@@ -85,31 +87,38 @@ export class TextAttribute1734873407457 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_text_attribute__item_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item',
-        }, {
-          name: 'fk__item_text_attribute__text_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['text_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'text_attribute',
-        }],
-        indices: [{
-          name: 'IDX__item_text_attribute__item_id',
-          columnNames: ['item_id'],
-        }, {
-          name: 'IDX__item_text_attribute__text_attribute_id',
-          columnNames: ['text_attribute_id'],
-        }, {
-          name: 'IDX__item_text_attribute__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_text_attribute__item_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item',
+          },
+          {
+            name: 'fk__item_text_attribute__text_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['text_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'text_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_text_attribute__item_id',
+            columnNames: ['item_id'],
+          },
+          {
+            name: 'IDX__item_text_attribute__text_attribute_id',
+            columnNames: ['text_attribute_id'],
+          },
+          {
+            name: 'IDX__item_text_attribute__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion

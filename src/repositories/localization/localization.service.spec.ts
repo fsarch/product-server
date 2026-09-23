@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { LocalizationService } from './localization.service.js';
 import { Localization } from '../../database/entities/localization.entity.js';
+import { LocalizationService } from './localization.service.js';
 
 describe('LocalizationService', () => {
   let service: LocalizationService;

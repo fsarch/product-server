@@ -47,21 +47,26 @@ export class Item1733694484415 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_type__catalog_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['catalog_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'catalog',
-        }],
-        indices: [{
-          name: 'IDX__item_type__catalog_id',
-          columnNames: ['catalog_id'],
-        }, {
-          name: 'IDX__item_type__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_type__catalog_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['catalog_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'catalog',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_type__catalog_id',
+            columnNames: ['catalog_id'],
+          },
+          {
+            name: 'IDX__item_type__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -105,33 +110,40 @@ export class Item1733694484415 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__attribute_item_type__attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }, {
-          name: 'fk__attribute_item_type__item_type_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_type_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item_type',
-        }],
-        indices: [{
-          name: 'IDX__attribute_item_type__attribute_id',
-          columnNames: ['attribute_id'],
-        }, {
-          name: 'IDX__attribute_item_type__item_type_id',
-          columnNames: ['item_type_id'],
-        }, {
-          name: 'UX__attribute_item_type__attribute_id__item_type_id',
-          columnNames: ['attribute_id', 'item_type_id'],
-          where: 'deletion_time IS NULL',
-          isUnique: true,
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__attribute_item_type__attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+          {
+            name: 'fk__attribute_item_type__item_type_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_type_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item_type',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__attribute_item_type__attribute_id',
+            columnNames: ['attribute_id'],
+          },
+          {
+            name: 'IDX__attribute_item_type__item_type_id',
+            columnNames: ['item_type_id'],
+          },
+          {
+            name: 'UX__attribute_item_type__attribute_id__item_type_id',
+            columnNames: ['attribute_id', 'item_type_id'],
+            where: 'deletion_time IS NULL',
+            isUnique: true,
+          },
+        ],
       }),
     );
     // endregion
@@ -180,41 +192,50 @@ export class Item1733694484415 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item__catalog_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['catalog_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'catalog',
-        }, {
-          name: 'fk__item__item_type_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_type_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item_type',
-        }, {
-          name: 'fk__item__parent_item_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['parent_item_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item',
-        }],
-        indices: [{
-          name: 'IDX__item__catalog_id',
-          columnNames: ['catalog_id'],
-        }, {
-          name: 'IDX__item__item_type_id',
-          columnNames: ['item_type_id'],
-        }, {
-          name: 'IDX__item__parent_item_id',
-          columnNames: ['parent_item_id'],
-        }, {
-          name: 'IDX__item__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item__catalog_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['catalog_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'catalog',
+          },
+          {
+            name: 'fk__item__item_type_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_type_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item_type',
+          },
+          {
+            name: 'fk__item__parent_item_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['parent_item_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item__catalog_id',
+            columnNames: ['catalog_id'],
+          },
+          {
+            name: 'IDX__item__item_type_id',
+            columnNames: ['item_type_id'],
+          },
+          {
+            name: 'IDX__item__parent_item_id',
+            columnNames: ['parent_item_id'],
+          },
+          {
+            name: 'IDX__item__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion

@@ -19,14 +19,16 @@ export class BooleanAttribute1734872207303 implements MigrationInterface {
             primaryKeyConstraintName: 'pk__boolean_attribute',
           },
         ],
-        foreignKeys: [{
-          name: 'fk__boolean_attribute__id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__boolean_attribute__id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+        ],
       }),
     );
     // endregion
@@ -75,31 +77,38 @@ export class BooleanAttribute1734872207303 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_boolean_attribute__item_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item',
-        }, {
-          name: 'fk__item_boolean_attribute__boolean_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['boolean_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'boolean_attribute',
-        }],
-        indices: [{
-          name: 'IDX__item_boolean_attribute__item_id',
-          columnNames: ['item_id'],
-        }, {
-          name: 'IDX__item_boolean_attribute__boolean_attribute_id',
-          columnNames: ['boolean_attribute_id'],
-        }, {
-          name: 'IDX__item_boolean_attribute__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_boolean_attribute__item_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item',
+          },
+          {
+            name: 'fk__item_boolean_attribute__boolean_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['boolean_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'boolean_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_boolean_attribute__item_id',
+            columnNames: ['item_id'],
+          },
+          {
+            name: 'IDX__item_boolean_attribute__boolean_attribute_id',
+            columnNames: ['boolean_attribute_id'],
+          },
+          {
+            name: 'IDX__item_boolean_attribute__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion

@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Catalog } from "../database/entities/catalog.entity.js";
+import { ApiProperty } from '@nestjs/swagger';
+import { Catalog } from '../database/entities/catalog.entity.js';
 
 export class CatalogCreateDto {
   @ApiProperty()

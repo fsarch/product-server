@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Localization } from "../database/entities/localization.entity.js";
+import { ApiProperty } from '@nestjs/swagger';
+import { Localization } from '../database/entities/localization.entity.js';
 
 export class LocalizationCreateDto {
   @ApiProperty()

@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CatalogService } from './catalog.service.js';
+import { vi } from 'vitest';
 import { Catalog } from '../../database/entities/catalog.entity.js';
+import { CatalogService } from './catalog.service.js';
 
 describe('CatalogService', () => {
   let service: CatalogService;
@@ -34,7 +34,9 @@ describe('CatalogService', () => {
 
       const result = await service.get('catalog-id');
 
-      expect(catalogRepository.findOne).toHaveBeenCalledWith({ where: { id: 'catalog-id' } });
+      expect(catalogRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'catalog-id' },
+      });
       expect(result).toBe(catalog);
     });
   });

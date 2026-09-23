@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { ItemType } from "../database/entities/item_type.entity.js";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ItemType } from '../database/entities/item_type.entity.js';
 
 export class ItemTypeDto {
   public static FromDbo(itemType: ItemType): ItemTypeDto {

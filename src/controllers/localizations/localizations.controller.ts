@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { LocalizationService } from "../../repositories/localization/localization.service.js";
-import { LocalizationCreateDto, LocalizationDto } from "../../models/localization.model.js";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  LocalizationCreateDto,
+  LocalizationDto,
+} from '../../models/localization.model.js';
+import { LocalizationService } from '../../repositories/localization/localization.service.js';
 
 @ApiTags('localization')
 @Controller({
@@ -10,15 +13,13 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 })
 @ApiBearerAuth()
 export class LocalizationsController {
-  constructor(
-    private readonly localizationService: LocalizationService,
-  ) {}
+  constructor(private readonly localizationService: LocalizationService) {}
 
   @Post()
-  public async Post(
-    @Body() localizationCreateDto: LocalizationCreateDto,
-  ) {
-    const createdLocalization = await this.localizationService.create(localizationCreateDto);
+  public async Post(@Body() localizationCreateDto: LocalizationCreateDto) {
+    const createdLocalization = await this.localizationService.create(
+      localizationCreateDto,
+    );
 
     return {
       id: createdLocalization.id,

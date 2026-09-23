@@ -1,0 +1,5 @@
+# pnpm workspace config (single package, no workspace members)
+allowBuilds:
+  '@scarf/scarf': false
+  better-sqlite3: true
+  protobufjs: true

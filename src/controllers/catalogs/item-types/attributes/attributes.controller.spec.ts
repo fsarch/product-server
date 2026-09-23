@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AttributesController } from './attributes.controller.js';
 import { AttributeItemTypeService } from '../../../../repositories/attribute-item-type/attribute-item-type.service.js';
+import { AttributesController } from './attributes.controller.js';
 
 describe('AttributesController', () => {
   let controller: AttributesController;

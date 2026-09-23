@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AttributeItemTypeService } from './attribute-item-type.service.js';
 import { AttributeItemType } from '../../database/entities/attribute_item_type.entity.js';
+import { AttributeItemTypeService } from './attribute-item-type.service.js';
 
 describe('AttributeItemTypeService', () => {
   let service: AttributeItemTypeService;

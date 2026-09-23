@@ -1,19 +1,43 @@
-import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
-import { BadRequestException, Body, ConflictException, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiQuery, ApiTags, getSchemaPath } from "@nestjs/swagger";
-import { AttributeService } from "../../../repositories/attribute/attribute.service.js";
 import {
-  AttributeCreateDto, attributeDboToAttributeDto,
-  AttributeDto, BooleanAttributeCreateDto, ImageAttributeCreateDto, JsonAttributeCreateDto, LinkAttributeCreateDto, ListAttributeCreateDto,
+  BadRequestException,
+  Body,
+  ConflictException,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiExtraModels,
+  ApiQuery,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { AttributeType } from '../../../constants/attribute-type.enum.js';
+import {
+  AttributeCreateDto,
+  AttributeDto,
+  attributeDboToAttributeDto,
+  BooleanAttributeCreateDto,
+  ImageAttributeCreateDto,
+  JsonAttributeCreateDto,
+  LinkAttributeCreateDto,
+  ListAttributeCreateDto,
   NumberAttributeCreateDto,
-  TextAttributeCreateDto
-} from "../../../models/attribute.model.js";
-import { AttributeType } from "../../../constants/attribute-type.enum.js";
-import { AttributeLocalizationDto, AttributeLocalizationSetDto } from "../../../models/attribute-localization.model.js";
+  TextAttributeCreateDto,
+} from '../../../models/attribute.model.js';
 import {
-  AttributeLocalizationService
-} from "../../../repositories/attribute-localization/attribute-localization.service.js";
+  AttributeLocalizationDto,
+  AttributeLocalizationSetDto,
+} from '../../../models/attribute-localization.model.js';
+import { AttributeService } from '../../../repositories/attribute/attribute.service.js';
+import { AttributeLocalizationService } from '../../../repositories/attribute-localization/attribute-localization.service.js';
 
 @ApiTags('attribute')
 @Controller({
@@ -37,28 +61,50 @@ export class AttributesController {
   @Post()
   @ApiBody({
     schema: {
-      oneOf: [{
-        $ref: getSchemaPath(NumberAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(TextAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(JsonAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(BooleanAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ListAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(LinkAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ImageAttributeCreateDto),
-      }],
+      oneOf: [
+        {
+          $ref: getSchemaPath(NumberAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(TextAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(JsonAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(BooleanAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ListAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(LinkAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ImageAttributeCreateDto),
+        },
+      ],
     },
   })
   public async Post(
     @Param('catalogId') catalogId: string,
-    @Body() attributeCreateDto: NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto | LinkAttributeCreateDto | ImageAttributeCreateDto,
+    @Body() attributeCreateDto:
+      | NumberAttributeCreateDto
+      | TextAttributeCreateDto
+      | JsonAttributeCreateDto
+      | BooleanAttributeCreateDto
+      | ListAttributeCreateDto
+      | LinkAttributeCreateDto
+      | ImageAttributeCreateDto,
   ) {
-    let type: NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto | LinkAttributeCreateDto | ImageAttributeCreateDto;
+    let type:
+      | NumberAttributeCreateDto
+      | TextAttributeCreateDto
+      | JsonAttributeCreateDto
+      | BooleanAttributeCreateDto
+      | ListAttributeCreateDto
+      | LinkAttributeCreateDto
+      | ImageAttributeCreateDto;
     if (attributeCreateDto.attributeTypeId === AttributeType.NUMBER) {
       type = plainToInstance(NumberAttributeCreateDto, attributeCreateDto);
     } else if (attributeCreateDto.attributeTypeId === AttributeType.TEXT) {
@@ -82,12 +128,18 @@ export class AttributesController {
       throw new BadRequestException(errors);
     }
 
-    const existingAttribute = await this.attributeService.getByName(catalogId, attributeCreateDto.name);
+    const existingAttribute = await this.attributeService.getByName(
+      catalogId,
+      attributeCreateDto.name,
+    );
     if (existingAttribute) {
       throw new ConflictException();
     }
 
-    const createdAttribute = await this.attributeService.create(catalogId, type);
+    const createdAttribute = await this.attributeService.create(
+      catalogId,
+      type,
+    );
 
     return {
       id: createdAttribute.id,
@@ -105,17 +157,24 @@ export class AttributesController {
   ) {
     const attributes = await this.attributeService.list(catalogId);
 
-    return Promise.all(attributes.map(async (attribute) => {
-      const mappedAttribute = attributeDboToAttributeDto(attribute);
+    return Promise.all(
+      attributes.map(async (attribute) => {
+        const mappedAttribute = attributeDboToAttributeDto(attribute);
 
-      if (include?.includes('localizations')) {
-        const localizations = await this.attributeLocalizationService.listLocalizationsByAttributeId(attribute.id);
+        if (include?.includes('localizations')) {
+          const localizations =
+            await this.attributeLocalizationService.listLocalizationsByAttributeId(
+              attribute.id,
+            );
 
-        mappedAttribute.localizations = localizations.map(AttributeLocalizationDto.FromDbo);
-      }
+          mappedAttribute.localizations = localizations.map(
+            AttributeLocalizationDto.FromDbo,
+          );
+        }
 
-      return mappedAttribute;
-    }));
+        return mappedAttribute;
+      }),
+    );
   }
 
   @Get(':attributeId')
@@ -132,9 +191,14 @@ export class AttributesController {
     const mappedAttribute = attributeDboToAttributeDto(attribute);
 
     if (include?.includes('localizations')) {
-      const localizations = await this.attributeLocalizationService.listLocalizationsByAttributeId(attribute.id);
+      const localizations =
+        await this.attributeLocalizationService.listLocalizationsByAttributeId(
+          attribute.id,
+        );
 
-      mappedAttribute.localizations = localizations.map(AttributeLocalizationDto.FromDbo);
+      mappedAttribute.localizations = localizations.map(
+        AttributeLocalizationDto.FromDbo,
+      );
     }
 
     return mappedAttribute;
@@ -146,7 +210,12 @@ export class AttributesController {
     @Param('localizationId') localizationId: string,
     @Body() attributeLocalizationSetDto: AttributeLocalizationSetDto,
   ) {
-    const attributeLocalization = await this.attributeLocalizationService.setLocalization(attributeId, localizationId, attributeLocalizationSetDto);
+    const attributeLocalization =
+      await this.attributeLocalizationService.setLocalization(
+        attributeId,
+        localizationId,
+        attributeLocalizationSetDto,
+      );
 
     return AttributeLocalizationDto.FromDbo(attributeLocalization);
   }

@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { AttributeType } from '../../constants/attribute-type.enum.js';
 import { getDataType } from './utils/data-type.mapper.js';
-import { AttributeType } from "../../constants/attribute-type.enum.js";
 
 export class BaseTables1720373216667 implements MigrationInterface {
   name = 'BaseTables1720373216667';
@@ -121,10 +121,12 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        indices: [{
-          name: 'IDX__attribute_type__external_id',
-          columnNames: ['external_id'],
-        }],
+        indices: [
+          {
+            name: 'IDX__attribute_type__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
 
@@ -204,31 +206,38 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__attribute__attribute_type_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['attribute_type_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute_type',
-        }, {
-          name: 'fk__attribute__catalog_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['catalog_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'catalog',
-        }],
-        indices: [{
-          name: 'IDX__attribute__catalog_id',
-          columnNames: ['catalog_id'],
-        }, {
-          name: 'IDX__attribute__attribute_type_id',
-          columnNames: ['attribute_type_id'],
-        }, {
-          name: 'IDX__attribute__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__attribute__attribute_type_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['attribute_type_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute_type',
+          },
+          {
+            name: 'fk__attribute__catalog_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['catalog_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'catalog',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__attribute__catalog_id',
+            columnNames: ['catalog_id'],
+          },
+          {
+            name: 'IDX__attribute__attribute_type_id',
+            columnNames: ['attribute_type_id'],
+          },
+          {
+            name: 'IDX__attribute__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -272,33 +281,40 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__attribute_localization__localization_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['localization_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'localization',
-        }, {
-          name: 'fk__attribute_localization__attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }],
-        indices: [{
-          name: 'IDX__attribute_localization__attribute_id',
-          columnNames: ['attribute_id'],
-        }, {
-          name: 'IDX__attribute_localization__localization_id',
-          columnNames: ['localization_id'],
-        }, {
-          name: 'UX__attribute_localization__attribute_id__localization_id',
-          columnNames: ['attribute_id', 'localization_id'],
-          where: 'deletion_time IS NULL',
-          isUnique: true,
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__attribute_localization__localization_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['localization_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'localization',
+          },
+          {
+            name: 'fk__attribute_localization__attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__attribute_localization__attribute_id',
+            columnNames: ['attribute_id'],
+          },
+          {
+            name: 'IDX__attribute_localization__localization_id',
+            columnNames: ['localization_id'],
+          },
+          {
+            name: 'UX__attribute_localization__attribute_id__localization_id',
+            columnNames: ['attribute_id', 'localization_id'],
+            where: 'deletion_time IS NULL',
+            isUnique: true,
+          },
+        ],
       }),
     );
     // endregion
@@ -320,14 +336,16 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__json_attribute__id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__json_attribute__id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+        ],
       }),
     );
     // endregion
@@ -344,14 +362,16 @@ export class BaseTables1720373216667 implements MigrationInterface {
             primaryKeyConstraintName: 'pk__list_attribute',
           },
         ],
-        foreignKeys: [{
-          name: 'fk__list_attribute__id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__list_attribute__id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+        ],
       }),
     );
     // endregion
@@ -396,21 +416,26 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__list_attribute_element__list_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['list_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'list_attribute',
-        }],
-        indices: [{
-          name: 'IDX__list_attribute_element__custom_list_id',
-          columnNames: ['list_attribute_id'],
-        }, {
-          name: 'IDX__list_attribute_element__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__list_attribute_element__list_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['list_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'list_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__list_attribute_element__custom_list_id',
+            columnNames: ['list_attribute_id'],
+          },
+          {
+            name: 'IDX__list_attribute_element__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -459,33 +484,40 @@ export class BaseTables1720373216667 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__list_attribute_element_localization__localization_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['localization_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'localization',
-        }, {
-          name: 'fk__list_attribute_element_localization__list_attribute_element_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['list_attribute_element_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'list_attribute_element',
-        }],
-        indices: [{
-          name: 'IDX__list_attribute_element_localization__list_attribute_element_id',
-          columnNames: ['list_attribute_element_id'],
-        }, {
-          name: 'IDX__list_attribute_element_localization__localization_id',
-          columnNames: ['localization_id'],
-        }, {
-          name: 'UX__list_attribute_element_localization__list_attribute_element_id__localization_id',
-          columnNames: ['list_attribute_element_id', 'localization_id'],
-          where: 'deletion_time IS NULL',
-          isUnique: true,
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__list_attribute_element_localization__localization_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['localization_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'localization',
+          },
+          {
+            name: 'fk__list_attribute_element_localization__list_attribute_element_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['list_attribute_element_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'list_attribute_element',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__list_attribute_element_localization__list_attribute_element_id',
+            columnNames: ['list_attribute_element_id'],
+          },
+          {
+            name: 'IDX__list_attribute_element_localization__localization_id',
+            columnNames: ['localization_id'],
+          },
+          {
+            name: 'UX__list_attribute_element_localization__list_attribute_element_id__localization_id',
+            columnNames: ['list_attribute_element_id', 'localization_id'],
+            where: 'deletion_time IS NULL',
+            isUnique: true,
+          },
+        ],
       }),
     );
     // endregion

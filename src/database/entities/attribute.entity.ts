@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
-  Entity, JoinColumn, OneToOne,
+  Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { TextAttribute } from "./text_attribute.entity.js";
-import { ImageAttribute } from "./image_attribute.entity.js";
+import { ImageAttribute } from './image_attribute.entity.js';
+import { TextAttribute } from './text_attribute.entity.js';
 
 @Entity({
   name: 'attribute',
@@ -67,4 +69,3 @@ export class CompleteAttribute extends Attribute {
   @JoinColumn({ name: 'id' })
   imageAttribute: ImageAttribute;
 }
-

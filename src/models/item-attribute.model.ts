@@ -1,6 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsBoolean, IsDefined, IsNumber, IsString, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsDefined,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class ItemTextAttributeCreateDto {
   @ApiProperty()

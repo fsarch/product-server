@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ItemTypeService } from './item-type.service.js';
-import { ItemType } from '../../database/entities/item_type.entity.js';
+import { vi } from 'vitest';
 import { AttributeItemType } from '../../database/entities/attribute_item_type.entity.js';
+import { ItemType } from '../../database/entities/item_type.entity.js';
+import { ItemTypeService } from './item-type.service.js';
 
 describe('ItemTypeService', () => {
   let service: ItemTypeService;
@@ -31,10 +31,17 @@ describe('ItemTypeService', () => {
 
   describe('GetByExternalId', () => {
     it('looks up the item type by catalog id and external id', async () => {
-      const itemType = { id: 'item-type-id', catalogId: 'catalog-id', externalId: '$system.product' };
+      const itemType = {
+        id: 'item-type-id',
+        catalogId: 'catalog-id',
+        externalId: '$system.product',
+      };
       itemTypeRepository.findOne.mockResolvedValue(itemType);
 
-      const result = await service.GetByExternalId('catalog-id', '$system.product');
+      const result = await service.GetByExternalId(
+        'catalog-id',
+        '$system.product',
+      );
 
       expect(itemTypeRepository.findOne).toHaveBeenCalledWith({
         where: { catalogId: 'catalog-id', externalId: '$system.product' },

@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { ListAttributeElement } from "../database/entities/list_attribute_element.entity.js";
-import { ListAttributeElementLocalizationDto } from "./list-attribute-element-localization.model.js";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ListAttributeElement } from '../database/entities/list_attribute_element.entity.js';
+import { ListAttributeElementLocalizationDto } from './list-attribute-element-localization.model.js';
 
 export class ListAttributeElementCreateDto {
   @ApiProperty()
@@ -12,7 +12,9 @@ export class ListAttributeElementCreateDto {
 }
 
 export class ListAttributeElementDto {
-  public static FromDbo(listAttributeElement: ListAttributeElement): ListAttributeElementDto {
+  public static FromDbo(
+    listAttributeElement: ListAttributeElement,
+  ): ListAttributeElementDto {
     const listAttributeElementDto = new ListAttributeElementDto();
 
     listAttributeElementDto.id = listAttributeElement.id;

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from "typeorm";
-import { ItemType } from "../../database/entities/item_type.entity.js";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ItemTypeCreateDto } from "../../models/item-type.model.js";
-import { AttributeItemType } from "../../database/entities/attribute_item_type.entity.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AttributeItemType } from '../../database/entities/attribute_item_type.entity.js';
+import { ItemType } from '../../database/entities/item_type.entity.js';
+import { ItemTypeCreateDto } from '../../models/item-type.model.js';
 
 @Injectable()
 export class ItemTypeService {
@@ -12,8 +12,7 @@ export class ItemTypeService {
     private readonly itemTypeRepository: Repository<ItemType>,
     @InjectRepository(AttributeItemType)
     private readonly attributeItemTypeRepository: Repository<AttributeItemType>,
-  ) {
-  }
+  ) {}
 
   public async List(catalogId: string) {
     return this.itemTypeRepository.find({

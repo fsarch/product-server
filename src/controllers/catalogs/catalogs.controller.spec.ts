@@ -1,11 +1,11 @@
-import { vi } from 'vitest';
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { CatalogsController } from './catalogs.controller.js';
-import { CatalogService } from '../../repositories/catalog/catalog.service.js';
-import { ItemTypeService } from '../../repositories/item-type/item-type.service.js';
+import { Test, TestingModule } from '@nestjs/testing';
+import { vi } from 'vitest';
 import { AttributeService } from '../../repositories/attribute/attribute.service.js';
 import { AttributeItemTypeService } from '../../repositories/attribute-item-type/attribute-item-type.service.js';
+import { CatalogService } from '../../repositories/catalog/catalog.service.js';
+import { ItemTypeService } from '../../repositories/item-type/item-type.service.js';
+import { CatalogsController } from './catalogs.controller.js';
 
 describe('CatalogsController', () => {
   let controller: CatalogsController;
@@ -35,7 +35,10 @@ describe('CatalogsController', () => {
 
   describe('Get', () => {
     it('returns the catalog when it exists', async () => {
-      catalogService.get.mockResolvedValue({ id: 'catalog-id', name: 'My Catalog' });
+      catalogService.get.mockResolvedValue({
+        id: 'catalog-id',
+        name: 'My Catalog',
+      });
 
       const result = await controller.Get('catalog-id');
 
@@ -46,7 +49,9 @@ describe('CatalogsController', () => {
     it('throws NotFoundException when the catalog does not exist', async () => {
       catalogService.get.mockResolvedValue(null);
 
-      await expect(controller.Get('unknown-id')).rejects.toThrow(NotFoundException);
+      await expect(controller.Get('unknown-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

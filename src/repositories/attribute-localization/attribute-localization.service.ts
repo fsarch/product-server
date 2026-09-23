@@ -1,13 +1,11 @@
+import * as crypto from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import { AttributeLocalizationSetDto } from "../../models/attribute-localization.model.js";
-import { Repository } from "typeorm";
-import { AttributeLocalization } from "../../database/entities/attribute_localization.entity.js";
-import { InjectRepository } from "@nestjs/typeorm";
-import * as crypto from "node:crypto";
-import { ListAttributeElementLocalizationSetDto } from "../../models/list-attribute-element-localization.model.js";
-import {
-  ListAttributeElementLocalization
-} from "../../database/entities/list_attribute_element_localization.entity.js";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AttributeLocalization } from '../../database/entities/attribute_localization.entity.js';
+import { ListAttributeElementLocalization } from '../../database/entities/list_attribute_element_localization.entity.js';
+import { AttributeLocalizationSetDto } from '../../models/attribute-localization.model.js';
+import { ListAttributeElementLocalizationSetDto } from '../../models/list-attribute-element-localization.model.js';
 
 @Injectable()
 export class AttributeLocalizationService {
@@ -16,16 +14,19 @@ export class AttributeLocalizationService {
     private readonly attributeLocalizationRepository: Repository<AttributeLocalization>,
     @InjectRepository(ListAttributeElementLocalization)
     private readonly listAttributeElementLocalizationRepository: Repository<ListAttributeElementLocalization>,
-  ) {
-  }
+  ) {}
 
-  public async setLocalization(attributeId: string, localizationId: string, setDto: AttributeLocalizationSetDto) {
+  public async setLocalization(
+    attributeId: string,
+    localizationId: string,
+    setDto: AttributeLocalizationSetDto,
+  ) {
     let localization = await this.attributeLocalizationRepository.findOne({
       where: {
         localizationId,
         attributeId,
       },
-    })
+    });
 
     if (!localization) {
       localization = this.attributeLocalizationRepository.create({
@@ -41,7 +42,9 @@ export class AttributeLocalizationService {
     return await this.attributeLocalizationRepository.save(localization);
   }
 
-  public async listLocalizationsByAttributeId(attributeId: string): Promise<AttributeLocalization[]> {
+  public async listLocalizationsByAttributeId(
+    attributeId: string,
+  ): Promise<AttributeLocalization[]> {
     return await this.attributeLocalizationRepository.find({
       where: {
         attributeId,
@@ -49,7 +52,9 @@ export class AttributeLocalizationService {
     });
   }
 
-  public async listElementLocalizations(elementId: string): Promise<ListAttributeElementLocalization[]> {
+  public async listElementLocalizations(
+    elementId: string,
+  ): Promise<ListAttributeElementLocalization[]> {
     return await this.listAttributeElementLocalizationRepository.find({
       where: {
         listAttributeElementId: elementId,
@@ -57,13 +62,18 @@ export class AttributeLocalizationService {
     });
   }
 
-  public async setElementLocalization(elementId: string, localizationId: string, setDto: ListAttributeElementLocalizationSetDto) {
-    let localization = await this.listAttributeElementLocalizationRepository.findOne({
-      where: {
-        localizationId,
-        listAttributeElementId: elementId,
-      },
-    })
+  public async setElementLocalization(
+    elementId: string,
+    localizationId: string,
+    setDto: ListAttributeElementLocalizationSetDto,
+  ) {
+    let localization =
+      await this.listAttributeElementLocalizationRepository.findOne({
+        where: {
+          localizationId,
+          listAttributeElementId: elementId,
+        },
+      });
 
     if (!localization) {
       localization = this.listAttributeElementLocalizationRepository.create({
@@ -78,6 +88,8 @@ export class AttributeLocalizationService {
     localization.name = setDto.name;
     localization.content = setDto.content;
 
-    return await this.listAttributeElementLocalizationRepository.save(localization);
+    return await this.listAttributeElementLocalizationRepository.save(
+      localization,
+    );
   }
 }

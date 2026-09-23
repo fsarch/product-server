@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { AttributeItemType } from "../database/entities/attribute_item_type.entity.js";
-import { attributeDboToAttributeDto, AttributeDto } from "./attribute.model.js";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AttributeItemType } from '../database/entities/attribute_item_type.entity.js';
+import { AttributeDto, attributeDboToAttributeDto } from './attribute.model.js';
 
 export class AttributeItemTypeCreateDto {
   @ApiProperty()
@@ -12,7 +12,9 @@ export class AttributeItemTypeCreateDto {
 }
 
 export class AttributeItemTypeDto {
-  public static FromDbo(attributeItemType: AttributeItemType): AttributeItemTypeDto {
+  public static FromDbo(
+    attributeItemType: AttributeItemType,
+  ): AttributeItemTypeDto {
     const attributeItemTypeDto = new AttributeItemTypeDto();
 
     attributeItemTypeDto.id = attributeItemType.id;

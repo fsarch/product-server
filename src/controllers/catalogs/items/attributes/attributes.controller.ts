@@ -1,17 +1,35 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiTags, getSchemaPath } from "@nestjs/swagger";
-import { ItemAttributeService } from "../../../../repositories/item-attribute/item-attribute.service.js";
-import { AttributeService } from "../../../../repositories/attribute/attribute.service.js";
-import { ItemService } from "../../../../repositories/item/item.service.js";
-import { AttributeItemTypeService } from "../../../../repositories/attribute-item-type/attribute-item-type.service.js";
 import {
-  ItemBooleanAttributeCreateDto, ItemImageAttributeCreateDto, ItemJsonAttributeCreateDto, ItemLinkAttributeCreateDto, ItemListAttributeCreateDto,
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiExtraModels,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { AttributeType } from '../../../../constants/attribute-type.enum.js';
+import {
+  ItemBooleanAttributeCreateDto,
+  ItemImageAttributeCreateDto,
+  ItemJsonAttributeCreateDto,
+  ItemLinkAttributeCreateDto,
+  ItemListAttributeCreateDto,
   ItemNumberAttributeCreateDto,
-  ItemTextAttributeCreateDto
-} from "../../../../models/item-attribute.model.js";
-import { AttributeType } from "../../../../constants/attribute-type.enum.js";
-import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
+  ItemTextAttributeCreateDto,
+} from '../../../../models/item-attribute.model.js';
+import { AttributeService } from '../../../../repositories/attribute/attribute.service.js';
+import { AttributeItemTypeService } from '../../../../repositories/attribute-item-type/attribute-item-type.service.js';
+import { ItemService } from '../../../../repositories/item/item.service.js';
+import { ItemAttributeService } from '../../../../repositories/item-attribute/item-attribute.service.js';
 
 @ApiTags('items')
 @Controller({
@@ -32,70 +50,112 @@ export class AttributesController {
     private readonly attributeService: AttributeService,
     private readonly itemService: ItemService,
     private readonly attributeItemTypeService: AttributeItemTypeService,
-  ) {
-  }
+  ) {}
 
   @Get()
   public async Get(
     @Param('catalogId') catalogId: string,
     @Param('itemId') itemId: string,
   ) {
-    return await this.itemAttributeService.ListCompleteByItemId(catalogId, itemId);
+    return await this.itemAttributeService.ListCompleteByItemId(
+      catalogId,
+      itemId,
+    );
   }
 
   @Put(':attributeId')
   @ApiBody({
     schema: {
-      oneOf: [{
-        $ref: getSchemaPath(ItemTextAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ItemBooleanAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ItemNumberAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ItemJsonAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ItemListAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ItemLinkAttributeCreateDto),
-      }, {
-        $ref: getSchemaPath(ItemImageAttributeCreateDto),
-      }],
+      oneOf: [
+        {
+          $ref: getSchemaPath(ItemTextAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ItemBooleanAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ItemNumberAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ItemJsonAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ItemListAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ItemLinkAttributeCreateDto),
+        },
+        {
+          $ref: getSchemaPath(ItemImageAttributeCreateDto),
+        },
+      ],
     },
   })
   public async SetAttribute(
     @Param('catalogId') catalogId: string,
     @Param('itemId') itemId: string,
     @Param('attributeId') attributeId: string,
-    @Body() createDto: ItemTextAttributeCreateDto | ItemBooleanAttributeCreateDto | ItemNumberAttributeCreateDto | ItemJsonAttributeCreateDto | ItemListAttributeCreateDto | ItemLinkAttributeCreateDto | ItemImageAttributeCreateDto,
+    @Body() createDto:
+      | ItemTextAttributeCreateDto
+      | ItemBooleanAttributeCreateDto
+      | ItemNumberAttributeCreateDto
+      | ItemJsonAttributeCreateDto
+      | ItemListAttributeCreateDto
+      | ItemLinkAttributeCreateDto
+      | ItemImageAttributeCreateDto,
   ) {
     const attribute = await this.attributeService.get(attributeId);
     if (!attribute) {
       throw new NotFoundException('attribute not found');
     }
     const item = await this.itemService.Get(itemId);
-    const itemAttribute = await this.attributeItemTypeService.GetByItemTypeAndAttributeId(item.itemTypeId, attribute.id);
+    const itemAttribute =
+      await this.attributeItemTypeService.GetByItemTypeAndAttributeId(
+        item.itemTypeId,
+        attribute.id,
+      );
     if (!itemAttribute) {
       throw new Error('could not get itemAttribute');
     }
 
-    let attributeCreateDto;
+    let attributeCreateDto: object;
     if (attribute.attributeTypeId === AttributeType.NUMBER) {
-      attributeCreateDto = plainToInstance(ItemNumberAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemNumberAttributeCreateDto,
+        createDto,
+      );
     } else if (attribute.attributeTypeId === AttributeType.TEXT) {
-      attributeCreateDto = plainToInstance(ItemTextAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemTextAttributeCreateDto,
+        createDto,
+      );
     } else if (attribute.attributeTypeId === AttributeType.JSON) {
-      attributeCreateDto = plainToInstance(ItemJsonAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemJsonAttributeCreateDto,
+        createDto,
+      );
     } else if (attribute.attributeTypeId === AttributeType.BOOLEAN) {
-      attributeCreateDto = plainToInstance(ItemBooleanAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemBooleanAttributeCreateDto,
+        createDto,
+      );
     } else if (attribute.attributeTypeId === AttributeType.LIST) {
-      attributeCreateDto = plainToInstance(ItemListAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemListAttributeCreateDto,
+        createDto,
+      );
     } else if (attribute.attributeTypeId === AttributeType.LINK) {
-      attributeCreateDto = plainToInstance(ItemLinkAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemLinkAttributeCreateDto,
+        createDto,
+      );
     } else if (attribute.attributeTypeId === AttributeType.IMAGE) {
-      attributeCreateDto = plainToInstance(ItemImageAttributeCreateDto, createDto);
+      attributeCreateDto = plainToInstance(
+        ItemImageAttributeCreateDto,
+        createDto,
+      );
     } else {
-      throw new Error('unknown attribute type')
+      throw new Error('unknown attribute type');
     }
 
     const errors = await validate(attributeCreateDto);

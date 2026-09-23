@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { AttributeType } from '../../constants/attribute-type.enum.js';
 import { getDataType } from './utils/data-type.mapper.js';
-import { AttributeType } from "../../constants/attribute-type.enum.js";
 
 export class ImageAttribute1762639425773 implements MigrationInterface {
   name = 'ImageAttribute1762639425773';
@@ -26,14 +26,16 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
             isNullable: false,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__image_attribute__id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'attribute',
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__image_attribute__id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'attribute',
+          },
+        ],
       }),
     );
     // endregion
@@ -77,31 +79,38 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_image_attribute__item_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item',
-        }, {
-          name: 'fk__item_image_attribute__image_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['image_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'image_attribute',
-        }],
-        indices: [{
-          name: 'IDX__item_image_attribute__item_id',
-          columnNames: ['item_id'],
-        }, {
-          name: 'IDX__item_image_attribute__image_attribute_id',
-          columnNames: ['image_attribute_id'],
-        }, {
-          name: 'IDX__item_image_attribute__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_image_attribute__item_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item',
+          },
+          {
+            name: 'fk__item_image_attribute__image_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['image_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'image_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_image_attribute__item_id',
+            columnNames: ['item_id'],
+          },
+          {
+            name: 'IDX__item_image_attribute__image_attribute_id',
+            columnNames: ['image_attribute_id'],
+          },
+          {
+            name: 'IDX__item_image_attribute__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -145,24 +154,30 @@ export class ImageAttribute1762639425773 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_image_attribute_element__item_image_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_image_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item_image_attribute',
-        }],
-        indices: [{
-          name: 'IDX__item_image_attribute_element__item_image_attribute_id',
-          columnNames: ['item_image_attribute_id'],
-        }, {
-          name: 'IDX__item_image_attribute_element__image_id',
-          columnNames: ['image_id'],
-        }, {
-          name: 'IDX__item_image_attribute_element__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_image_attribute_element__item_image_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_image_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item_image_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_image_attribute_element__item_image_attribute_id',
+            columnNames: ['item_image_attribute_id'],
+          },
+          {
+            name: 'IDX__item_image_attribute_element__image_id',
+            columnNames: ['image_id'],
+          },
+          {
+            name: 'IDX__item_image_attribute_element__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion

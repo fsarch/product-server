@@ -21,7 +21,6 @@ export class ItemNumberAttribute {
   })
   itemId: string;
 
-
   @Column({
     name: 'number_attribute_id',
     type: 'uuid',

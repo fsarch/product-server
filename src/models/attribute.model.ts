@@ -1,15 +1,23 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { AttributeType } from "../constants/attribute-type.enum.js";
-import { Attribute } from "../database/entities/attribute.entity.js";
-import { Optional } from "@nestjs/common";
-import { IsEnum, IsInt, IsNumber, IsObject, IsOptional, IsString, Min } from "class-validator";
-import { TextAttribute } from "../database/entities/text_attribute.entity.js";
-import { NumberAttribute } from "../database/entities/number_attribute.entity.js";
-import { JsonAttribute } from "../database/entities/json_attribute.entity.js";
-import { AttributeLocalizationDto } from "./attribute-localization.model.js";
-import { BooleanAttribute } from "../database/entities/boolean_attribute.entity.js";
-import { LinkAttribute } from "../database/entities/link_attribute.entity.js";
-import { ImageAttribute } from "../database/entities/image_attribute.entity.js";
+import { Optional } from '@nestjs/common';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { AttributeType } from '../constants/attribute-type.enum.js';
+import { Attribute } from '../database/entities/attribute.entity.js';
+import { BooleanAttribute } from '../database/entities/boolean_attribute.entity.js';
+import { ImageAttribute } from '../database/entities/image_attribute.entity.js';
+import { JsonAttribute } from '../database/entities/json_attribute.entity.js';
+import { LinkAttribute } from '../database/entities/link_attribute.entity.js';
+import { NumberAttribute } from '../database/entities/number_attribute.entity.js';
+import { TextAttribute } from '../database/entities/text_attribute.entity.js';
+import { AttributeLocalizationDto } from './attribute-localization.model.js';
 
 export class AttributeCreateDto {
   @ApiProperty()
@@ -118,10 +126,20 @@ export class ImageAttributeCreateDto extends AttributeCreateDto {
   imageServerUrl: string;
 }
 
-export type TAttributeCreateDto = NumberAttributeCreateDto | TextAttributeCreateDto | JsonAttributeCreateDto | BooleanAttributeCreateDto | ListAttributeCreateDto | LinkAttributeCreateDto | ImageAttributeCreateDto;
+export type TAttributeCreateDto =
+  | NumberAttributeCreateDto
+  | TextAttributeCreateDto
+  | JsonAttributeCreateDto
+  | BooleanAttributeCreateDto
+  | ListAttributeCreateDto
+  | LinkAttributeCreateDto
+  | ImageAttributeCreateDto;
 
 export class AttributeDto {
-  public static CopyFromDbo<T extends AttributeDto>(attribute: Attribute, attributeDto: T): T {
+  public static CopyFromDbo<T extends AttributeDto>(
+    attribute: Attribute,
+    attributeDto: T,
+  ): T {
     attributeDto.id = attribute.id;
     attributeDto.name = attribute.name;
     attributeDto.attributeTypeId = attribute.attributeTypeId as AttributeType;
@@ -148,7 +166,9 @@ export class AttributeDto {
 }
 
 export class TextAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & TextAttribute): TextAttributeDto {
+  public static FromDbo(
+    attribute: Attribute & TextAttribute,
+  ): TextAttributeDto {
     const attributeDto = super.CopyFromDbo(attribute, new TextAttributeDto());
 
     attributeDto.minLength = attribute.minLength;
@@ -167,7 +187,9 @@ export class TextAttributeDto extends AttributeDto {
 }
 
 export class NumberAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & NumberAttribute): NumberAttributeDto {
+  public static FromDbo(
+    attribute: Attribute & NumberAttribute,
+  ): NumberAttributeDto {
     const attributeDto = super.CopyFromDbo(attribute, new NumberAttributeDto());
 
     attributeDto.minValue = attribute.minValue;
@@ -191,15 +213,22 @@ export class NumberAttributeDto extends AttributeDto {
 }
 
 export class BooleanAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & BooleanAttribute): BooleanAttributeDto {
-    const attributeDto = super.CopyFromDbo(attribute, new BooleanAttributeDto());
+  public static FromDbo(
+    attribute: Attribute & BooleanAttribute,
+  ): BooleanAttributeDto {
+    const attributeDto = super.CopyFromDbo(
+      attribute,
+      new BooleanAttributeDto(),
+    );
 
     return attributeDto;
   }
 }
 
 export class JsonAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & JsonAttribute): JsonAttributeDto {
+  public static FromDbo(
+    attribute: Attribute & JsonAttribute,
+  ): JsonAttributeDto {
     const attributeDto = super.CopyFromDbo(attribute, new JsonAttributeDto());
 
     attributeDto.schema = attribute.schema;
@@ -213,7 +242,9 @@ export class JsonAttributeDto extends AttributeDto {
 }
 
 export class LinkAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & LinkAttribute): LinkAttributeDto {
+  public static FromDbo(
+    attribute: Attribute & LinkAttribute,
+  ): LinkAttributeDto {
     const attributeDto = super.CopyFromDbo(attribute, new LinkAttributeDto());
 
     attributeDto.itemTypeId = attribute.item_type_id;
@@ -227,11 +258,17 @@ export class LinkAttributeDto extends AttributeDto {
 }
 
 export class ImageAttributeDto extends AttributeDto {
-  public static FromDbo(attribute: Attribute & { imageAttribute: ImageAttribute; imageServerUrl?: string; }): ImageAttributeDto {
+  public static FromDbo(
+    attribute: Attribute & {
+      imageAttribute: ImageAttribute;
+      imageServerUrl?: string;
+    },
+  ): ImageAttributeDto {
     const attributeDto = super.CopyFromDbo(attribute, new ImageAttributeDto());
 
     // TODO: fix different input models!
-    attributeDto.imageServerUrl = attribute.imageAttribute?.imageServerUrl ?? attribute.imageServerUrl;
+    attributeDto.imageServerUrl =
+      attribute.imageAttribute?.imageServerUrl ?? attribute.imageServerUrl;
 
     return attributeDto;
   }

@@ -51,31 +51,38 @@ export class ItemAttributes1733697377083 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_json_attribute__item_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item',
-        }, {
-          name: 'fk__item_json_attribute__json_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['json_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'json_attribute',
-        }],
-        indices: [{
-          name: 'IDX__item_json_attribute__item_id',
-          columnNames: ['item_id'],
-        }, {
-          name: 'IDX__item_json_attribute__json_attribute_id',
-          columnNames: ['json_attribute_id'],
-        }, {
-          name: 'IDX__item_json_attribute__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_json_attribute__item_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item',
+          },
+          {
+            name: 'fk__item_json_attribute__json_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['json_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'json_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_json_attribute__item_id',
+            columnNames: ['item_id'],
+          },
+          {
+            name: 'IDX__item_json_attribute__json_attribute_id',
+            columnNames: ['json_attribute_id'],
+          },
+          {
+            name: 'IDX__item_json_attribute__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -119,31 +126,38 @@ export class ItemAttributes1733697377083 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_list_attribute__item_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item',
-        }, {
-          name: 'fk__item_list_attribute__list_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['list_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'list_attribute',
-        }],
-        indices: [{
-          name: 'IDX__item_list_attribute__item_id',
-          columnNames: ['item_id'],
-        }, {
-          name: 'IDX__item_list_attribute__list_attribute_id',
-          columnNames: ['list_attribute_id'],
-        }, {
-          name: 'IDX__item_list_attribute__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_list_attribute__item_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item',
+          },
+          {
+            name: 'fk__item_list_attribute__list_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['list_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'list_attribute',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_list_attribute__item_id',
+            columnNames: ['item_id'],
+          },
+          {
+            name: 'IDX__item_list_attribute__list_attribute_id',
+            columnNames: ['list_attribute_id'],
+          },
+          {
+            name: 'IDX__item_list_attribute__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion
@@ -187,31 +201,38 @@ export class ItemAttributes1733697377083 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [{
-          name: 'fk__item_list_attribute_element__item_list_attribute_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['item_list_attribute_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'item_list_attribute',
-        }, {
-          name: 'fk__item_list_attribute_element__list_attribute_element_id',
-          onUpdate: 'NO ACTION',
-          onDelete: 'NO ACTION',
-          columnNames: ['list_attribute_element_id'],
-          referencedColumnNames: ['id'],
-          referencedTableName: 'list_attribute_element',
-        }],
-        indices: [{
-          name: 'IDX__item_list_attribute_element__item_list_attribute_id',
-          columnNames: ['item_list_attribute_id'],
-        }, {
-          name: 'IDX__item_list_attribute_element__list_attribute_element_id',
-          columnNames: ['list_attribute_element_id'],
-        }, {
-          name: 'IDX__item_list_attribute_element__external_id',
-          columnNames: ['external_id'],
-        }],
+        foreignKeys: [
+          {
+            name: 'fk__item_list_attribute_element__item_list_attribute_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['item_list_attribute_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'item_list_attribute',
+          },
+          {
+            name: 'fk__item_list_attribute_element__list_attribute_element_id',
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            columnNames: ['list_attribute_element_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'list_attribute_element',
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX__item_list_attribute_element__item_list_attribute_id',
+            columnNames: ['item_list_attribute_id'],
+          },
+          {
+            name: 'IDX__item_list_attribute_element__list_attribute_element_id',
+            columnNames: ['list_attribute_element_id'],
+          },
+          {
+            name: 'IDX__item_list_attribute_element__external_id',
+            columnNames: ['external_id'],
+          },
+        ],
       }),
     );
     // endregion

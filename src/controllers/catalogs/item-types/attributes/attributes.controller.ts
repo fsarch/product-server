@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { AttributeItemTypeService } from "../../../../repositories/attribute-item-type/attribute-item-type.service.js";
-import { AttributeItemTypeCreateDto, AttributeItemTypeDto } from "../../../../models/attribute-item-type.model.js";
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  AttributeItemTypeCreateDto,
+  AttributeItemTypeDto,
+} from '../../../../models/attribute-item-type.model.js';
+import { AttributeItemTypeService } from '../../../../repositories/attribute-item-type/attribute-item-type.service.js';
 
 @ApiTags('item-type')
 @Controller({
@@ -10,10 +13,7 @@ import { AttributeItemTypeCreateDto, AttributeItemTypeDto } from "../../../../mo
 })
 @ApiBearerAuth()
 export class AttributesController {
-  constructor(
-    private readonly attributeItemType: AttributeItemTypeService,
-  ) {
-  }
+  constructor(private readonly attributeItemType: AttributeItemTypeService) {}
 
   @Get()
   @ApiQuery({
@@ -27,9 +27,12 @@ export class AttributesController {
     @Param('itemTypeId') itemTypeId: string,
     @Param('embed') embed: Array<string>,
   ) {
-    const itemTypes = await this.attributeItemType.ListByItemTypeId(itemTypeId, {
-      embedAttribute: embed?.includes('attribute'),
-    });
+    const itemTypes = await this.attributeItemType.ListByItemTypeId(
+      itemTypeId,
+      {
+        embedAttribute: embed?.includes('attribute'),
+      },
+    );
 
     return itemTypes.map(AttributeItemTypeDto.FromDbo);
   }
@@ -39,7 +42,11 @@ export class AttributesController {
     @Param('itemTypeId') itemTypeId: string,
     @Body() attributeItemTypeCreateDto: AttributeItemTypeCreateDto,
   ) {
-    const createdAttributeItemType = await this.attributeItemType.Create(itemTypeId, attributeItemTypeCreateDto.attributeId, attributeItemTypeCreateDto);
+    const createdAttributeItemType = await this.attributeItemType.Create(
+      itemTypeId,
+      attributeItemTypeCreateDto.attributeId,
+      attributeItemTypeCreateDto,
+    );
 
     return {
       id: createdAttributeItemType,
